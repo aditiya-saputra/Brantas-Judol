@@ -4,3 +4,10 @@ __pycache__/
 .mypy_cache/
 .pytest_cache/
 *.egg-info/
+
+# hasil analisis / probing -> data, jangan ikut ke repo public
+all_san.txt
+hasil.json
+hasil.txt
+infra.json
+tls.json

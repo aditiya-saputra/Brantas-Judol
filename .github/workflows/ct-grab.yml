@@ -41,8 +41,8 @@ jobs:
 
       - name: Commit hasil
         run: |
-          git config user.email "bot@users.noreply.github.com"
-          git config user.name "ct-bot"
+          git config user.email "aditiya.saputrax1x2@gmail.com"
+          git config user.name "aditiya-saputra"
           git add domain.txt ct.db
           git diff --cached --quiet || git commit -m "update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push

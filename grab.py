@@ -26,7 +26,7 @@ from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, NameOID
 
 VERSION = "0.1"
-USER_AGENT = f"ct-grabber/{VERSION} (+mailto:you@example.com)"
+USER_AGENT = f"ct-grabber/{VERSION} (+mailto:aditiya.saputrax1x2@gmail.com)"
 
 LOG_LIST_URLS = (
     "https://www.gstatic.com/ct/log_list/v3/log_list.json",
