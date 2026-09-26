@@ -1,0 +1,48 @@
+name: ct-grab
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ct-grab
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  grab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install deps
+        run: pip install -r requirements.txt pytest
+
+      - name: Test
+        run: python -m pytest -q
+
+      - name: Run grabber
+        run: python grab.py --max-entries 100000 --max-seconds 1200
+
+      - name: Sort & dedupe
+        run: |
+          sort -u domain.txt -o domain.txt
+          wc -l domain.txt
+
+      - name: Commit hasil
+        run: |
+          git config user.email "bot@users.noreply.github.com"
+          git config user.name "ct-bot"
+          git add domain.txt ct.db
+          git diff --cached --quiet || git commit -m "update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
