@@ -8,6 +8,18 @@ filter keyword -> tulis domain.txt.
 Cursor hybrid disimpan di SQLite (ct.db):
   * tail_index  -> posisi entri terbaru yang sudah diproses (sinyal utama)
   * next_index  -> posisi backlog (scan dari awal log, sisanya budget run)
+
+Catatan cakupan -- baca sebelum mengubah budget:
+  backlog memindai dari posisi 0 dan secara praktis tidak akan pernah menyusul.
+  Total entri lintas 27 log terukur ~41 miliar, sementara budget per run cuma
+  ~200 ribu. Memberi backlog jatah lebih besar justru memotong entri segar,
+  yaitu satu-satunya sumber nilai untuk misi ini, tanpa berarti apa pun terhadap
+  41 miliar. Yang menambah nilai adalah phase tail.
+
+  Karena re-anchor melompatkan tail_index ke ujung tree, `tree_size - tail_index`
+  SELALU mendekati 100% walau nyaris tak ada entri yang dibaca (terukur
+  99,95% untuk cakupan sebenarnya 0,46%). Jangan pernah memakai angka itu.
+  Pakai print_coverage(), yang menghitung dari entri diproses vs terlewati.
 """
 
 from __future__ import annotations
@@ -19,13 +31,13 @@ import sqlite3
 import sys
 import time
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Callable, NamedTuple, Optional
 
 import httpx
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, NameOID
 
-VERSION = "0.1"
+VERSION = "0.2"
 USER_AGENT = f"ct-grabber/{VERSION} (+mailto:aditiya.saputrax1x2@gmail.com)"
 
 LOG_LIST_URLS = (
@@ -54,7 +66,10 @@ LABEL = r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
 DOMAIN_RE = re.compile(rf"{LABEL}(?:\.{LABEL})+")
 
 DEFAULT_BATCH = 256
-DEFAULT_MAX_ENTRIES = 100_000
+# Benchmark (4.000 entri, log argon2026h2): ~174 entri/s dengan sleep 0.25,
+# jadi jendela 1200s muat ~209.000 entri. Jangan dinaikkan tanpa mengukur
+# ulang -- kalau throughput turun, deadline akan memotong lebih banyak log.
+DEFAULT_MAX_ENTRIES = 200_000
 DEFAULT_MAX_SECONDS = 1200.0
 DEFAULT_TAIL_WINDOW = 100_000
 DEFAULT_SLEEP = 0.25
@@ -395,7 +410,11 @@ def fetch_range(
     pos = start
     used = 0
     while pos <= stop and used < budget and time.monotonic() < deadline:
-        end = min(pos + cfg.batch - 1, stop)
+        # Batasi batch ke sisa budget: tanpa ini `used` bisa melewati budget
+        # sampai batch-1 entri per panggilan (loop mengecek di awal iterasi,
+        # bukan sebelum fetch), sehingga --max-entries bukan batas keras.
+        remaining = budget - used
+        end = min(pos + min(cfg.batch, remaining) - 1, stop)
         try:
             payload = _get_json(
                 client, f"{log_url}/ct/v1/get-entries", {"start": pos, "end": end}
@@ -418,6 +437,24 @@ def fetch_range(
     return pos, used
 
 
+class LogResult(NamedTuple):
+    """Hasil satu log.
+
+    skipped  : entri yang dilewati re-anchor. Ini yang dibutuhkan untuk
+               menghitung cakupan sebenarnya -- tail_index sendiri melompat ke
+               ujung tree sehingga `tree_size - tail_index` selalu mendekati
+               100% walau nyaris tak ada entri yang dibaca.
+    backlog  : tree_size - next_index, yaitu entri yang belum pernah discan
+               sama sekali sejak log dimulai.
+    """
+
+    used: int
+    next_index: int
+    tail_index: int
+    skipped: int
+    backlog: int
+
+
 def grab_log(
     client: httpx.Client,
     conn: sqlite3.Connection,
@@ -426,20 +463,22 @@ def grab_log(
     budget: int,
     deadline: float,
     handle: Callable[[dict], None],
-) -> tuple[int, int, int]:
+) -> LogResult:
     """Satu log: phase tail dulu (entri terbaru), lalu backlog dengan sisa budget."""
     log_url = log["url"]
 
     # Jatah log ini sudah habis: jangan buang get-sth, dan jangan sentuh
     # updated_at supaya log ini tetap di urutan pertama run berikutnya.
     if time.monotonic() >= deadline or budget <= 0:
-        return 0, *get_cursor(conn, log["log_id"])
+        nxt, tail = get_cursor(conn, log["log_id"])
+        return LogResult(0, nxt, tail, 0, 0)
 
     try:
         sth = _get_json(client, f"{log_url}/ct/v1/get-sth")
     except (FetchError, httpx.HTTPError) as exc:
         print(f"      sth error: {exc}", file=sys.stderr)
-        return 0, *get_cursor(conn, log["log_id"])
+        nxt, tail = get_cursor(conn, log["log_id"])
+        return LogResult(0, nxt, tail, 0, 0)
 
     tree_size = int(sth.get("tree_size") or 0)
     next_index, tail_index = get_cursor(conn, log["log_id"])
@@ -451,7 +490,7 @@ def grab_log(
     if time.monotonic() >= deadline or budget <= 0:
         # get-sth tadi saja sudah menghabiskan jatah: skip fetch, jangan
         # sentuh updated_at (log ini tetap di urutan pertama run berikutnya)
-        return 0, next_index, tail_index
+        return LogResult(0, next_index, tail_index, 0, tree_size - next_index)
 
     used = 0
 
@@ -462,9 +501,14 @@ def grab_log(
     desired = min(cfg.tail_window, budget)
     tail_start = max(tail_index, tree_size - desired)
     tail_start = max(0, min(tail_start, tree_size))
-    if tail_index > 0 and tail_start > tail_index:
+
+    # Entri yang dilewati re-anchor. Saat bootstrap (tail_index=0) angka ini
+    # tidak dihitung: yang tertinggal bukan "entri yang dilewati", melainkan
+    # seluruh riwayat log yang memang belum pernah disentuh.
+    skipped = max(0, tail_start - tail_index) if tail_index > 0 else 0
+    if skipped:
         print(
-            f"      re-anchor tail: lewati {tail_start - tail_index} entri "
+            f"      re-anchor tail: lewati {skipped} entri "
             f"(lag > jatah {desired})",
             file=sys.stderr,
         )
@@ -503,7 +547,9 @@ def grab_log(
     if used > 0 or not had_work:
         set_cursor(conn, log, next_index, tail_index)
 
-    return used, next_index, tail_index
+    return LogResult(
+        used, next_index, tail_index, skipped, max(0, tree_size - next_index)
+    )
 
 
 # --------------------------------------------------------------------------
@@ -514,12 +560,24 @@ def grab_log(
 def make_handler(fout, stats: dict) -> Callable[[dict], None]:
     seen: set[str] = set()
 
+    # Jangan telan kegagalan parse diam-diam: bug programming (TypeError,
+    # NameError) ikut terhitung sebagai parse_fail dan tidak akan pernah
+    # terlihat kalau cuma diakumulasi jadi angka. Cetak beberapa sampel pertama
+    # saja supaya jelas apa yang rusak tanpa membanjiri log.
+    max_samples = 5
+
     def handle(raw: dict) -> None:
         stats["entries"] += 1
         try:
             domains = domains_from_entry(raw)
-        except Exception:
+        except Exception as exc:
             stats["parse_fail"] += 1
+            if stats["parse_fail"] <= max_samples:
+                print(
+                    f"      parse_fail #{stats['parse_fail']}: "
+                    f"{type(exc).__name__}: {exc}",
+                    file=sys.stderr,
+                )
             return
         for domain in domains:
             if domain in seen:
@@ -536,7 +594,8 @@ def make_handler(fout, stats: dict) -> Callable[[dict], None]:
 def run(cfg: argparse.Namespace) -> int:
     started = time.monotonic()
     deadline = started + cfg.max_seconds
-    stats = {"entries": 0, "written": 0, "parse_fail": 0}
+    stats = {"entries": 0, "written": 0, "parse_fail": 0,
+             "skipped": 0, "backlog": 0}
 
     client = httpx.Client(
         timeout=httpx.Timeout(30.0, connect=10.0),
@@ -599,14 +658,19 @@ def run(cfg: argparse.Namespace) -> int:
                 log_deadline = min(deadline, now + time_slice)
 
                 label = log["description"] or log["url"]
-                used, next_index, tail_index = grab_log(
+                res = grab_log(
                     client, conn, log, cfg, budget_slice, log_deadline, handler
                 )
-                budget -= used
-                print(
-                    f"[{position}/{total_logs}] {label}: +{used} entri, "
-                    f"tail={tail_index}, backlog={next_index}"
+                budget -= res.used
+                stats["skipped"] += res.skipped
+                stats["backlog"] += res.backlog
+                line = (
+                    f"[{position}/{total_logs}] {label}: +{res.used} entri, "
+                    f"tail={res.tail_index}, next={res.next_index}"
                 )
+                if res.skipped:
+                    line += f", lewati={res.skipped}"
+                print(line)
     except KeyboardInterrupt:
         print("\ninterrupted", file=sys.stderr)
         return 130
@@ -619,7 +683,31 @@ def run(cfg: argparse.Namespace) -> int:
         f"selesai: entri={stats['entries']} kandidat={stats['written']} "
         f"gagal_parse={stats['parse_fail']} waktu={elapsed:.1f}s"
     )
+    print_coverage(stats)
     return 0
+
+
+def print_coverage(stats: dict) -> None:
+    """Cetak cakupan sebenarnya.
+
+    Jangan pernah memakai `tree_size - tail_index` sebagai ukuran cakupan:
+    re-anchor melompatkan tail_index ke ujung tree, jadi angka itu hampir
+    selalu mendekati 100% padahal yang benar-benar dibaca bisa di bawah 1%.
+    """
+    flow = stats["entries"] + stats["skipped"]
+    if flow:
+        print(
+            f"cakupan aliran : {stats['entries']:,} dari {flow:,} entri baru "
+            f"= {stats['entries'] / flow * 100:.2f}% "
+            f"(dilewati re-anchor: {stats['skipped']:,})"
+        )
+    else:
+        print("cakupan aliran : n/a (bootstrap, tidak ada entri baru terukur)")
+    if stats["backlog"]:
+        print(
+            f"backlog         : {stats['backlog']:,} entri "
+            "belum pernah discan (next_index belum menyusul ujung tree)"
+        )
 
 
 # --------------------------------------------------------------------------
@@ -635,7 +723,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out", default="domain.txt", help="output (default: domain.txt)")
     parser.add_argument(
         "--max-entries", type=int, default=DEFAULT_MAX_ENTRIES,
-        help="budget total entri per run (default: 100000)",
+        help=f"budget total entri per run (default: {DEFAULT_MAX_ENTRIES})",
     )
     parser.add_argument(
         "--max-seconds", type=float, default=DEFAULT_MAX_SECONDS,

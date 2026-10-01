@@ -32,7 +32,13 @@ jobs:
         run: python -m pytest -q
 
       - name: Run grabber
-        run: python grab.py --max-entries 100000 --max-seconds 1200
+        # --max-entries 200000: benchmark (4.000 entri, log argon2026h2) memberi
+        #   ~174 entri/s dengan sleep 0.25, jadi 1200s muat ~209.000 entri.
+        #   Angka lama 100000 membuat run berhenti di ~575s dari jendela 1200s
+        #   yang tersedia -- setengah jendela terbuang percuma.
+        # --max-seconds 1200 tetap jadi penjaga keras: kalau throughput anjlok,
+        #   deadline memotong dengan bersih (cursor per log sudah ter-commit).
+        run: python grab.py --max-entries 200000 --max-seconds 1200
 
       - name: Sort & dedupe
         run: |
