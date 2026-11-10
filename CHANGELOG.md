@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Read-only urlscan.io evidence probe.** `probe.py` checks whether candidates
+  from `domain.txt` have ever been scanned by urlscan.io and prints a summary with
+  links to result pages. Search only — no classification, no blocklist export.
+  Samples `--limit` candidates with a fixed `--seed` (default 25, seed 0), sends
+  `API-Key` when `PROBE_API_KEY` is set, retries on 429/5xx honouring
+  `Retry-After`, and stops after `--max-failures` consecutive failures.
+- **`.github/workflows/urlscan-probe.yml`** — daily at `11 5 * * *` plus manual
+  dispatch, with `limit`/`size`/`sleep`/`seed` inputs. `permissions: contents: read`
+  and it commits nothing; results upload as a 14-day artifact. Deliberately
+  separate from `ct-grab.yml`, which holds `contents: write` + `git push`.
+- 15 tests in `tests/test_probe.py` on `httpx.MockTransport` — no network.
+
+### Notes
+
+- urlscan.io does not publish the numeric rate limits or the `size` default and
+  maximum. Defaults here (25 domains, `size=1`, 6s between requests, 3 retries)
+  are deliberately conservative rather than derived from a documented quota.
+
 ### Fixed
 
 - **Infrastructure hostnames were emitted as candidates.**

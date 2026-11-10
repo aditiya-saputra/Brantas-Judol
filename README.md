@@ -3,9 +3,10 @@
 Certificate Transparency–based **discovery layer** for suspected Indonesian online
 gambling (`judol`) domains.
 
-> **Status: only the discovery layer is implemented.** The probing, classification,
-> blocklist-export and feedback stages described in the project vision are **not
-> built yet**. Everything below documents what actually runs today.
+> **Status: discovery plus a read-only evidence probe.** The probing stage exists
+> only as a urlscan.io *search* (`probe.py`) — it checks whether a candidate was
+> ever scanned and prints the result. Classification, blocklist export and the
+> feedback loop are **not built**. A listed domain is still a candidate signal.
 
 ---
 
@@ -213,6 +214,9 @@ Ordered by expected impact. Not built yet.
    that the 1,000 domains/6h target was implicitly calibrated to the current ~0.5%
    sampling rate; fixing discovery multiplies candidate volume and will saturate
    this stage. `domain.txt` is currently an unbounded queue with no backpressure.
+   **[urlscan.io](https://urlscan.io) is the evidence source for this stage** —
+   a read-only search exists (`probe.py`), classification does not. See
+   [Evidence probing](#evidence-probing-urlscanio).
 5. **Harden CI** — dependencies are unpinned in a job holding `contents: write`
    and `git push`. Move to a lock file with `--require-hashes`.
 6. **Repository hygiene** — `ct.db` is a binary committed every run; `domain.txt`
@@ -222,6 +226,90 @@ If the full pipeline is built, **prompt injection is the top security concern**:
 page content fetched from attacker-controlled sites will be fed to an LLM that
 decides what gets blocked. Never let site text act as instructions, and never let
 an LLM alone add an entry to a public blocklist.
+
+---
+
+## Evidence probing (urlscan.io)
+
+urlscan.io scans URLs and stores the HTTP transactions, DOM, and screenshots in
+a public, searchable archive. For this project it answers the question
+`domain.txt` deliberately does not: *does this candidate actually serve gambling
+content?* Discovery produces candidates; urlscan.io supplies the evidence.
+
+**What exists today: search only.** `probe.py` checks whether a candidate has
+ever been scanned and prints the summary. There is no classification and no
+blocklist export — a row in `domain.txt` still proves only that a certificate
+was issued.
+
+Probing **never** runs inside `ct-grab.yml`: that job holds `contents: write` and
+`git push`, and adding a third-party API call there adds a failure mode to the
+job that mutates state. Use the separate `urlscan-probe` workflow, which is
+read-only (`contents: read`) and commits nothing.
+
+### Search
+
+```
+GET https://urlscan.io/api/v1/search/?q=domain:<domain>&size=<n>
+```
+
+| | |
+|---|---|
+| Query | `q` — Lucene-style; `domain:example.com` matches scans contacting that domain |
+| Page size | `size` — undocumented default and maximum; keep requests small |
+| Response keys | `results`, `total`, `has_more`, `took`, `search_date_limit_days` |
+| Hidden result page | `https://urlscan.io/result/<uuid>/` — cite this as evidence |
+
+Unauthenticated search returns `200 OK` — verified 2026-11-10 against a domain
+with no scans (`total: 0`, no error field). An API key is still expected for
+sustained use: the [API introduction](https://docs.urlscan.io/pages/api-intro)
+states that unauthenticated users only receive minor quotas, while not publishing
+the numeric limits. Treat the quotas as unknown until measured.
+
+### Running it
+
+```bash
+# Cek 25 kandidat acak, jeda 6s antar request
+python probe.py
+
+# Lebih spesifik
+python probe.py --limit 50 --size 5 --sleep 4 --seed 42 --json-out probe.json
+```
+
+| Flag | Default | Purpose |
+|---|---|---|
+| `--domains` | `domain.txt` | Source of candidates |
+| `--limit` | `25` | How many domains to check |
+| `--size` | `1` | Scans requested per domain |
+| `--sleep` | `6.0` | Delay between requests, in seconds |
+| `--seed` | `0` | Sample seed — same seed, same set |
+| `--max-failures` | `3` | Stop after N consecutive failed requests |
+| `--json-out` | — | Write results as JSON |
+
+Set `PROBE_API_KEY` to send an `API-Key` header. Without it the script still
+runs — the endpoint is public — but you get the anonymous quota.
+
+In CI, `.github/workflows/urlscan-probe.yml` runs daily at `11 5 * * *` and on
+manual dispatch, with `limit`/`size`/`sleep`/`seed` as dispatch inputs. It sends
+`secrets.URLSCAN_API_KEY` when that secret exists, uploads `probe-result.json` as
+an artifact (kept 14 days), and never commits.
+
+### Constraints for whoever builds the rest
+
+- **A result is evidence, not a verdict.** A scan containing a candidate's domain
+  does not prove it is a gambling service. Candidates shared with `pages.dev`,
+  `workers.dev` or `vercel.app` must never be escalated into blocklist entries
+  from a single scan.
+- **Scan text is attacker-controlled.** The DOM and page titles returned by
+  urlscan.io come from the suspected gambling site itself. They must never be
+  treated as instructions (see the prompt-injection note above), and must never
+  be the sole basis for an automated blocklist addition.
+- **Keep it out of CI by default.** The current workflow runs every 6 hours with
+  `contents: write` and `git push`. Adding a third-party API call there means an
+  API key in CI secrets and one more external failure mode in a job that commits
+  state. Probe on demand or as a separate, read-only workflow.
+- **Respect the quota.** `domain.txt` currently holds ~97,000 candidates with no
+  backpressure; querying all of them is not viable. Sample, cache, and respect
+  rate-limit responses instead of retrying blindly.
 
 ---
 

@@ -1,0 +1,112 @@
+name: urlscan-probe
+
+# Probing kandidat lewat urlscan.io. Read-only: tidak commit, tidak push.
+#
+# Sengaja dipisah dari ct-grab.yml:
+#   * ct-grab.yml memegang `contents: write` + `git push`. Menambah panggilan
+#     API pihak ketiga di sana menambah mode gagal baru pada job yang mengubah
+#     state.
+#   * Kandidat di domain.txt ~97 ribu, sedangkan kuota urlscan tidak
+#     dipublikasikan. Menyapu semuanya per run tidak realistis, jadi yang
+#     diambil hanya sampel kecil.
+#
+# Hasil scan adalah BUKTI, bukan vonis: domain yang punya scan belum tentu
+# situs judol, dan workflow ini tidak menulis apa pun ke repo.
+
+on:
+  schedule:
+    # 05:11 UTC -- sengaja digeser dari jadwal ct-grab (23 */6 * * *) supaya
+    # kedua job tidak berebut resource runner di menit yang sama.
+    - cron: '11 5 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Jumlah domain yang diperiksa'
+        required: false
+        default: '25'
+      size:
+        description: 'Scan per domain yang diminta'
+        required: false
+        default: '1'
+      sleep:
+        description: 'Jeda antar request (detik)'
+        required: false
+        default: '6'
+      seed:
+        description: 'Seed sampel (run dengan seed sama = himpunan sama)'
+        required: false
+        default: '0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: urlscan-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install deps
+        run: pip install -r requirements.txt pytest
+
+      - name: Test
+        run: python -m pytest -q
+
+      - name: Run probe
+        env:
+          # Dikirim sebagai header kalau secret tersedia. Skrip tetap jalan
+          # tanpa key (endpoint publik), tapi kuota anonim kecil -- lihat
+          # README bagian "Planned evidence source".
+          URLSCAN_API_KEY: ${{ secrets.URLSCAN_API_KEY }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_SIZE: ${{ inputs.size }}
+          INPUT_SLEEP: ${{ inputs.sleep }}
+          INPUT_SEED: ${{ inputs.seed }}
+        run: |
+          # workflow_dispatch memberi inputs.*; schedule tidak (kosong).
+          # Default di sini harus sama dengan default workflow_dispatch.
+          LIMIT="${INPUT_LIMIT:-25}"
+          SIZE="${INPUT_SIZE:-1}"
+          SLEEP="${INPUT_SLEEP:-6}"
+          SEED="${INPUT_SEED:-0}"
+
+          echo "limit=$LIMIT size=$SIZE sleep=$SLEEP seed=$SEED"
+          echo "api key: $([ -n "$URLSCAN_API_KEY" ] && echo tersedia || echo tidak ada)"
+
+          # Jaga-jaga: input dari workflow_dispatch tetap harus numerik.
+          case "$LIMIT" in ''|*[!0-9]*) echo "limit tidak valid: $LIMIT" >&2; exit 2;; esac
+          case "$SLEEP" in ''|*[!0-9]*) echo "sleep tidak valid: $SLEEP" >&2; exit 2;; esac
+
+          if [ -n "$URLSCAN_API_KEY" ]; then
+            export PROBE_API_KEY="$URLSCAN_API_KEY"
+          fi
+
+          python probe.py \
+            --domains domain.txt \
+            --limit "$LIMIT" \
+            --size "$SIZE" \
+            --sleep "$SLEEP" \
+            --seed "$SEED" \
+            --json-out probe-result.json
+
+      - name: Upload hasil
+        # always(): kalau probe berhenti karena kuota, sebagian hasil tetap
+        # berguna untuk diperiksa.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: urlscan-probe-${{ github.run_id }}
+          path: probe-result.json
+          if-no-files-found: warn
+          retention-days: 14
