@@ -3,10 +3,11 @@
 Certificate Transparency–based **discovery layer** for suspected Indonesian online
 gambling (`judol`) domains.
 
-> **Status: discovery plus a read-only evidence probe.** The probing stage exists
-> only as a urlscan.io *search* (`probe.py`) — it checks whether a candidate was
-> ever scanned and prints the result. Classification, blocklist export and the
-> feedback loop are **not built**. A listed domain is still a candidate signal.
+> **Status: discovery, evidence probe, and an experimental LLM classifier.**
+> `probe.py` checks urlscan.io for existing scans; `classify.py` asks Gemini to
+> score a candidate 0–100 and buckets it into `blocklist.txt`, `whitelist.txt`,
+> or `review.txt`. **None of that output is committed** — it is LLM output, not
+> human review. A listed domain is still a candidate signal.
 
 ---
 
@@ -310,6 +311,82 @@ an artifact (kept 14 days), and never commits.
 - **Respect the quota.** `domain.txt` currently holds ~97,000 candidates with no
   backpressure; querying all of them is not viable. Sample, cache, and respect
   rate-limit responses instead of retrying blindly.
+
+---
+
+## LLM classification (Gemini)
+
+**Experimental, unverified output.** `classify.py` takes candidates, collects up
+to 10 urlscan.io result URLs as evidence, and asks Gemini to score each domain
+0–100 with Google Search grounding. The score is bucketed:
+
+| Score | File | Meaning |
+|---|---|---|
+| `>= 80` | `blocklist.txt` | strong signal — **still not a verified blocklist** |
+| `<= 20` | `whitelist.txt` | most likely not gambling |
+| `21–79` | `review.txt` | ambiguous, needs a human |
+
+**The thresholds are 80/20, not 50/50.** A domain scoring 49 and one scoring 51
+are indistinguishable, and the constraint above says an LLM must never on its own
+add an entry to a public blocklist. The grey zone forces borderline cases into
+`review.txt` where a human decides. Override with `--block-threshold` /
+`--allow-threshold`.
+
+All three files are **gitignored**. The `classify` workflow uploads them as a
+14-day artifact and commits nothing — publishing unreviewed LLM output into a
+public repository is the same as publishing an unreviewed blocklist.
+
+### API surface
+
+Verified 2026-11-10 against the official docs:
+
+```
+POST https://generativelanguage.googleapis.com/v1beta/interactions
+headers: x-goog-api-key, Content-Type: application/json, Api-Revision: 2026-05-20
+body:    model, input, system_instruction,
+         tools: [{"type": "google_search"}],
+         response_format: {type: "text", mime_type: "application/json", schema: ...}
+response: steps[-1].content[0].text   (JSON matching the schema)
+```
+
+Default model is `gemini-3.8-flash`. Note this is the Interactions API — not
+`generateContent`, which the current docs no longer use for this endpoint.
+
+### Running it
+
+```bash
+export GEMINI_API_KEY=...          # never commit this
+python classify.py --limit 10      # writes blocklist/whitelist/review.txt
+```
+
+| Flag | Default | Purpose |
+|---|---|---|
+| `--domains` | `domain.txt` | Candidate source |
+| `--limit` | `10` | Domains per run |
+| `--seed` | `0` | Sample seed |
+| `--links` | `10` | Evidence URLs sent per domain |
+| `--model` | `gemini-3.8-flash` | Gemini model |
+| `--block-threshold` | `80` | Minimum score for `blocklist.txt` |
+| `--allow-threshold` | `20` | Maximum score for `whitelist.txt` |
+| `--out-dir` | `.` | Where the three files go |
+| `--sleep` | `2.0` | Delay between domains |
+| `--json-out` | — | Full results including `reason` |
+
+In CI, `.github/workflows/classify.yml` runs daily at `41 7 * * *` plus manual
+dispatch, needs the `GEMINI_API_KEY` secret, and is `contents: read`.
+
+### Safety properties worth keeping
+
+- **Site text is data, never instruction.** The system instruction forbids
+  following anything inside the evidence, and only URL/title/domain metadata from
+  urlscan.io is sent — never DOM content.
+- **Absence of evidence lowers confidence.** A domain with no urlscan.io scans is
+  told explicitly that evidence is missing rather than scored as if clean.
+- **Every decision carries a `reason`**, so a wrong bucket can be audited after
+  the fact.
+- **The model cannot promote a shared platform.** The instruction names
+  `pages.dev`, `workers.dev`, `vercel.app`, `netlify.app` and `blogspot.com` as
+  never-gambling-by-association.
 
 ---
 

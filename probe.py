@@ -70,13 +70,13 @@ def pick_sample(domains: list[str], limit: int, seed: int) -> list[str]:
     return rng.sample(domains, limit)
 
 
-def probe(
+def _fetch_results(
     client: httpx.Client,
     domain: str,
     size: int,
     retries: int = 3,
 ) -> dict:
-    """Cari scan untuk satu domain. Kembalikan dict ringkas."""
+    """Satu pencarian ke urlscan.io. Kembalikan payload mentah."""
     params = {"q": f"domain:{domain}", "size": size}
     delay = 10.0
     last: Optional[str] = None
@@ -108,20 +108,52 @@ def probe(
         if not isinstance(payload, dict):
             last = "respons bukan objek JSON"
             continue
-
-        total = int(payload.get("total") or 0)
-        results = payload.get("results") or []
-        top = results[0] if results else {}
-        return {
-            "domain": domain,
-            "total": total,
-            "has_more": bool(payload.get("has_more")),
-            "first_uuid": top.get("_id") or "",
-            "first_url": (top.get("page") or {}).get("url") or "",
-            "first_scanned": (top.get("task") or {}).get("time") or "",
-        }
+        return payload
 
     raise RateLimited(f"menyerah pada {domain}: {last}")
+
+
+def search_scans(
+    client: httpx.Client,
+    domain: str,
+    size: int,
+    retries: int = 3,
+) -> list[dict]:
+    """Kembalikan daftar scan ringkas untuk satu domain (bisa kosong)."""
+    payload = _fetch_results(client, domain, size, retries)
+    out: list[dict] = []
+    for item in payload.get("results") or []:
+        if not isinstance(item, dict):
+            continue
+        out.append(
+            {
+                "uuid": item.get("_id") or "",
+                "url": (item.get("page") or {}).get("url") or "",
+                "scanned": (item.get("task") or {}).get("time") or "",
+            }
+        )
+    return [hit for hit in out if hit["uuid"]]
+
+
+def probe(
+    client: httpx.Client,
+    domain: str,
+    size: int,
+    retries: int = 3,
+) -> dict:
+    """Cari scan untuk satu domain. Kembalikan dict ringkas."""
+    payload = _fetch_results(client, domain, size, retries)
+    total = int(payload.get("total") or 0)
+    results = payload.get("results") or []
+    top = results[0] if results else {}
+    return {
+        "domain": domain,
+        "total": total,
+        "has_more": bool(payload.get("has_more")),
+        "first_uuid": top.get("_id") or "",
+        "first_url": (top.get("page") or {}).get("url") or "",
+        "first_scanned": (top.get("task") or {}).get("time") or "",
+    }
 
 
 def summarize(rows: list[dict]) -> str:

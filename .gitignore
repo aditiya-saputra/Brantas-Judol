@@ -11,3 +11,10 @@ hasil.json
 hasil.txt
 infra.json
 tls.json
+
+# keluaran klasifikasi LLM -> belum diverifikasi manusia, jangan dipublikasikan
+blocklist.txt
+whitelist.txt
+review.txt
+probe-result.json
+probe.json

@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Experimental Gemini classifier (`classify.py`).** Scores candidates 0–100
+  using up to 10 urlscan.io result URLs as evidence plus Google Search grounding,
+  then buckets them into `blocklist.txt`, `whitelist.txt` or `review.txt`.
+  Thresholds are **80/20**, not 50/50: a 49 and a 51 are indistinguishable, and
+  the project rule is that an LLM must never on its own add to a public blocklist,
+  so the grey zone routes to `review.txt`. Overridable via
+  `--block-threshold` / `--allow-threshold`.
+- **`.github/workflows/classify.yml`** — daily at `41 7 * * *` plus dispatch,
+  `permissions: contents: read`, requires the `GEMINI_API_KEY` secret, uploads
+  the three files as a 14-day artifact and commits nothing.
+- `probe.search_scans()` — returns every urlscan.io hit for a domain, refactored
+  out of `probe()` with shared request logic in `_fetch_results()`.
+  `probe.probe()` behaviour is unchanged.
+- `blocklist.txt`, `whitelist.txt`, `review.txt` and probe JSON outputs added to
+  `.gitignore` — unreviewed LLM output must not be published from a repo.
+- 28 tests in `tests/test_classify.py` on `httpx.MockTransport` — no network.
+
+### Notes
+
+- The classifier uses the **Interactions API** (`POST /v1beta/interactions`,
+  `Api-Revision: 2026-05-20`, `tools: [{"type": "google_search"}]`,
+  `response_format.mime_type: application/json`), not `generateContent`. Default
+  model `gemini-3.8-flash`; both verified against the official docs on 2026-11-10.
+- Only URL/title/domain metadata from urlscan.io is sent to the model — never DOM
+  content — and the system instruction treats all evidence as data, not
+  instructions.
 - **Read-only urlscan.io evidence probe.** `probe.py` checks whether candidates
   from `domain.txt` have ever been scanned by urlscan.io and prints a summary with
   links to result pages. Search only — no classification, no blocklist export.

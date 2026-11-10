@@ -1,0 +1,121 @@
+name: classify
+
+# Klasifikasi kandidat lewat Gemini + Google Search grounding.
+#
+# Read-only terhadap repo: hasil (blocklist/whitelist/review) hanya jadi
+# artifact, TIDAK di-commit. Alasannya bukan sekadar kerapian -- keluaran LLM
+# belum diverifikasi manusia, jadi mempublikasikannya ke repo publik sama
+# dengan menerbitkan blocklist tanpa review.
+#
+# Terpisah dari ct-grab.yml yang memegang `contents: write` + `git push`.
+#
+# Butuh repository secret GEMINI_API_KEY. Tanpa secret, job gagal di step
+# pertama dengan pesan jelas (bukan diam-diam lolos).
+
+on:
+  schedule:
+    # 07:41 UTC -- sengaja tidak bertabrakan dengan ct-grab (23 */6 * * *)
+    # maupun urlscan-probe (11 5 * * *).
+    - cron: '41 7 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Jumlah domain per run'
+        required: false
+        default: '10'
+      block_threshold:
+        description: 'Skor minimum masuk blocklist'
+        required: false
+        default: '80'
+      allow_threshold:
+        description: 'Skor maksimum masuk whitelist'
+        required: false
+        default: '20'
+      seed:
+        description: 'Seed sampel'
+        required: false
+        default: '0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: classify
+  cancel-in-progress: false
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install deps
+        run: pip install -r requirements.txt pytest
+
+      - name: Test
+        run: python -m pytest -q
+
+      - name: Check secret
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::error::Secret GEMINI_API_KEY belum diset."
+            echo "Tambahkan di Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+          echo "GEMINI_API_KEY tersedia"
+
+      - name: Run classifier
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_BLOCK: ${{ inputs.block_threshold }}
+          INPUT_ALLOW: ${{ inputs.allow_threshold }}
+          INPUT_SEED: ${{ inputs.seed }}
+        run: |
+          # schedule tidak mengisi inputs.* -- default harus sama dengan
+          # default workflow_dispatch di atas.
+          LIMIT="${INPUT_LIMIT:-10}"
+          BLOCK="${INPUT_BLOCK:-80}"
+          ALLOW="${INPUT_ALLOW:-20}"
+          SEED="${INPUT_SEED:-0}"
+
+          echo "limit=$LIMIT block=$BLOCK allow=$ALLOW seed=$SEED"
+
+          for pair in "limit:$LIMIT" "block:$BLOCK" "allow:$ALLOW"; do
+            value="${pair#*:}"
+            case "$value" in
+              ''|*[!0-9]*) echo "::error::nilai tidak valid: $pair" >&2; exit 2;;
+            esac
+          done
+
+          mkdir -p hasil
+          python classify.py \
+            --domains domain.txt \
+            --limit "$LIMIT" \
+            --block-threshold "$BLOCK" \
+            --allow-threshold "$ALLOW" \
+            --seed "$SEED" \
+            --out-dir hasil \
+            --json-out hasil/classify-result.json
+
+      - name: Upload hasil
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: classify-${{ github.run_id }}
+          path: |
+            hasil/blocklist.txt
+            hasil/whitelist.txt
+            hasil/review.txt
+            hasil/classify-result.json
+          if-no-files-found: warn
+          retention-days: 14
