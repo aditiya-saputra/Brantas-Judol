@@ -5,6 +5,30 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Infrastructure hostnames were emitted as candidates.**
+  `0digicert8i7rtp.aws-prod24…sfdc.net`, `…rtpuyq.usw2.cache.amazonaws.com`,
+  `…rtpxxx.mongodb-dev.net` and similar machine-generated names passed the filter
+  because `rtp` there is followed by `.`, which the left-hand boundary rule in
+  `is_candidate()` never examined. `INFRA_SUFFIXES` now rejects hostnames under
+  shared infrastructure (Salesforce, AWS, Azure, observability, dev database
+  endpoints, wildcard resolvers). Applied to the committed `domain.txt`:
+  **97,334 → 97,183** rows; all 151 removed entries were infrastructure hosts.
+
+  Shared hosting (`pages.dev`, `workers.dev`, `vercel.app`) is deliberately
+  **not** rejected — thousands of real gambling sites are hosted there.
+
+### Notes
+
+- Narrowing the `rtp` rule itself was measured and rejected. Of the 2,998 rows
+  containing `rtp`, 2,020 have `rtp` followed by a letter, and most are genuine
+  brands (`rtperigo4d.top`, `rtplivejackpot338.com`, `rtpibetslot4.life`).
+  Requiring a digit or separator after `rtp` would have discarded them. Filtering
+  is therefore done per host, not by tightening the keyword boundary.
+
 ## [0.2.0] - 2026-10-02
 
 ### Added

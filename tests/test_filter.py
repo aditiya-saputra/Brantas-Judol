@@ -73,3 +73,40 @@ def test_is_candidate(domain, expected):
 def test_keyword_case_insensitive():
     assert grab.is_candidate("ToGeL88.XYZ")
     assert grab.is_candidate("RTP-GACOR.SITE")
+
+@pytest.mark.parametrize(
+    "domain",
+    [
+        # nama acak di host Salesforce: "rtp" disusul titik, jadi aturan
+        # ketetanggaan huruf tidak menangkapnya
+        "0digicert8i7rtp.aws-prod24-apsouth2.urawatchdog.sfdc.net",
+        # AWS / Amazon Web Services EU
+        "10rtp38ktrlg1w1c.mq-gamma.eusc-de-east-1.on.amazonwebservices.eu",
+        "2pbj1ldm1ttfdpmpwivjyz0h99u24rtpur.mq.il-central-1.amazonaws.com",
+        # database dev endpoint
+        "13acc863d4f5a5d77cc44789.rtpxxx.mongodb-dev.net",
+        # wildcard resolver
+        "1dk1y0rtpjy9v7jj.th88j0uxwmjqnfag.whm.en.74.208.73.27.nip.io",
+    ],
+)
+def test_infrastructure_hosts_are_not_candidates(domain):
+    """Host bersama: nama acak buatan mesin, bukan situs judol."""
+    assert grab.is_candidate(domain) is False
+
+@pytest.mark.parametrize(
+    "domain",
+    [
+        # brand judol asli dengan "rtp" disusul huruf -- inilah yang membuat
+        # aturan ketetanggaan huruf tidak boleh dipakai untuk mempersempit
+        "rtperigo4d.top",
+        "rtplivejackpot338.com",
+        "rtpibetslot4.life",
+        "livertpmawarslotterkini.com",
+        # brand judol di hosting bersama yang harus TETAP lolos
+        "rtpbambu-mav.pages.dev",
+        "rtp-slots-aplikasi-hotwin55org.pages.dev",
+    ],
+)
+def test_real_brands_on_shared_hosts_are_not_filtered(domain):
+    """Penyaringan infrastruktur tidak boleh ikut membuang situs judol asli."""
+    assert grab.is_candidate(domain) is True

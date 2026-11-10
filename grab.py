@@ -62,6 +62,40 @@ KEYWORD_PATTERN = re.compile("|".join(map(re.escape, STRONG_KEYWORDS)), re.IGNOR
 # supaya "superslot" / "gacorslot" tetap ketangkep.
 RTP_PATTERN = re.compile(r"rtp", re.IGNORECASE)
 
+# Host bersama milik infrastruktur: nama acak "rtp..." di sini dibuat mesin,
+# bukan situs judol. Aturan "rtp" berbasis ketetanggaan huruf TIDAK bisa
+# memisahkannya -- terukur pada domain.txt, 2.020 entri ber-"rtp"+huruf dan
+# mayoritas justru brand judol asli ("rtperigo4d.top",
+# "rtplivejackpot338.com"). Karena itu penyaringan dilakukan per host, bukan
+# dengan mempersempit aturan "rtp".
+#
+# Sengaja TIDAK memuat "pages.dev", "workers.dev", "vercel.app" dan sejenisnya:
+# ribuan situs judol asli memang di-hosting di sana, jadi memblokirnya akan
+# membuang recall nyata.
+INFRA_SUFFIXES = (
+    # Salesforce marketing/ops host
+    ".sfdc.net",
+    ".force.com",
+    ".salesforce.com",
+    # AWS
+    ".amazonaws.com",
+    ".amazonaws.eu",
+    ".amazonwebservices.eu",
+    ".on.aws",
+    # Azure / Google internal host
+    ".azure.net",
+    ".azurewebsites.net",
+    ".googleusercontent.com",
+    # observability
+    ".sentry.io",
+    # database / dev endpoint
+    ".mongodb-dev.net",
+    ".mongodb.net",
+    # dynamic DNS & wildcard resolver (nama acak, bukan domain bisnis)
+    ".nip.io",
+    ".sslip.io",
+)
+
 LABEL = r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
 DOMAIN_RE = re.compile(rf"{LABEL}(?:\.{LABEL})+")
 
@@ -244,6 +278,8 @@ def domains_from_entry(entry: dict) -> set[str]:
 def is_candidate(domain: str) -> bool:
     if KEYWORD_PATTERN.search(domain):
         return True
+    if domain.endswith(INFRA_SUFFIXES):
+        return False
     for match in RTP_PATTERN.finditer(domain):
         start = match.start()
         if start == 0 or not domain[start - 1].isalpha():
