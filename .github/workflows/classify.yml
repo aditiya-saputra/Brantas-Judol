@@ -98,12 +98,36 @@ jobs:
           done
 
           mkdir -p hasil
+
+          # Dua tahap, sengaja dipisah. probe.py mengumpulkan bukti urlscan
+          # sekali dengan throttle-nya sendiri, lalu classify.py membaca file
+          # itu. Sebelumnya classify memanggil urlscan langsung dan run #1
+          # kena HTTP 429 di tiga domain pertama sehingga nol terklasifikasi.
+          #
+          # Probe dibiarkan gagal tanpa menghentikan job: bukti bersifat
+          # opsional, dan klasifikasi tanpa bukti tetap menghasilkan output
+          # (dengan skor yang cenderung lebih rendah).
+          if python probe.py \
+              --domains domain.txt \
+              --limit "$LIMIT" \
+              --seed "$SEED" \
+              --size 10 \
+              --sleep 15 \
+              --json-out hasil/probe.json; then
+            echo "bukti urlscan: terkumpul"
+            EVIDENCE_ARG="--evidence hasil/probe.json"
+          else
+            echo "::warning::probe urlscan gagal (kemungkinan kuota 429); klasifikasi tanpa bukti"
+            EVIDENCE_ARG=""
+          fi
+
           python classify.py \
             --domains domain.txt \
             --limit "$LIMIT" \
             --block-threshold "$BLOCK" \
             --allow-threshold "$ALLOW" \
             --seed "$SEED" \
+            $EVIDENCE_ARG \
             --out-dir hasil \
             --json-out hasil/classify-result.json
 
@@ -117,5 +141,6 @@ jobs:
             hasil/whitelist.txt
             hasil/review.txt
             hasil/classify-result.json
+            hasil/probe.json
           if-no-files-found: warn
           retention-days: 14

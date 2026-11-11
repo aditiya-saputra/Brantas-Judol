@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 """Klasifikasi kandidat judol lewat Gemini + Google Search grounding.
 
-Alur: kandidat domain.txt -> cari bukti di urlscan.io -> kirim 10 URL hasil
-scan ke Gemini (dengan Google Search grounding) -> Gemini menilai probabilitas
-0-100 -> tulis ke salah satu dari tiga file:
+Alur: probe.py mengumpulkan bukti -> classify.py menilai -> tiga file.
 
+    python probe.py --limit 10 --json-out probe.json
+    python classify.py --evidence probe.json
+
+classify.py TIDAK memanggil urlscan.io sendiri. Pemisahan ini disengaja:
+kuota pencarian urlscan untuk pengguna anonim sangat kecil -- classify run #1
+(2026-11-11) kena HTTP 429 pada tiga domain pertama sehingga nol domain
+terklasifikasi. Dengan satu pengumpul bukti, kuota juga tidak terpakai dua kali.
+
+Tanpa --evidence, classify.py tetap jalan memakai sampel dari --domains dengan
+bukti kosong; skornya cenderung lebih rendah karena model diminta menurunkan
+keyakinan saat tidak ada bukti.
+
+Hasil:
     blocklist.txt   probabilitas >= 80
     whitelist.txt   probabilitas <= 20
     review.txt      di antaranya, atau bila penilaian tidak bisa dipercaya
@@ -276,8 +287,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help=f"skor maksimum masuk whitelist (default: {DEFAULT_ALLOW_THRESHOLD})",
     )
     parser.add_argument("--out-dir", default=".", help="direktori file hasil")
+    parser.add_argument("--sleep", type=float, default=2.0, help="jeda antar domain (detik)")
     parser.add_argument(
-        "--sleep", type=float, default=2.0, help="jeda antar domain (detik)"
+        "--evidence",
+        help="hasil probe.py (JSON) yang berisi domain + uuids sebagai bukti",
     )
     parser.add_argument("--json-out", help="simpan hasil lengkap sebagai JSON")
     return parser
@@ -305,20 +318,45 @@ def main(argv: Optional[list[str]] = None) -> int:
         print(f"[fatal] {args.domains} kosong", file=sys.stderr)
         return 1
 
-    sample = probe.pick_sample(domains, args.limit, args.seed)
-    print(
-        f"kandidat: {len(domains)} | diklasifikasi: {len(sample)} | "
-        f"model: {args.model} | ambang: <= {args.allow_threshold} whitelist, "
-        f">= {args.block_threshold} blocklist"
-    )
+    # Bukti urlscan dibaca dari hasil `probe.py`, bukan diambil ulang di sini.
+    # Dua alasan: kuota pencarian urlscan kecil (classify run #1 kena 429 di
+    # tiga domain pertama), dan memisahkan pengumpulan bukti dari penilaian
+    # membuat tiap tahap bisa dijalankan serta diperiksa sendiri.
+    evidence: dict[str, list[str]] = {}
+    if args.evidence:
+        try:
+            with open(args.evidence, encoding="utf-8") as handle:
+                for item in json.load(handle):
+                    domain = str(item.get("domain") or "")
+                    if not domain:
+                        continue
+                    evidence[domain] = [
+                        f"https://urlscan.io/result/{uid}/"
+                        for uid in (item.get("uuids") or [item.get("first_uuid") or ""])
+                        if uid
+                    ][: args.links]
+        except (OSError, ValueError) as exc:
+            print(f"[fatal] gagal membaca bukti {args.evidence}: {exc}", file=sys.stderr)
+            return 1
+
+    # Tanpa --evidence, klasifikasi tetap jalan memakai kandidat dari
+    # --domains dan mengirim bukti kosong (skor cenderung lebih rendah).
+    if evidence:
+        sample = list(evidence)
+        print(
+            f"bukti dari {args.evidence}: {len(sample)} domain | "
+            f"model: {args.model} | ambang: <= {args.allow_threshold} whitelist, "
+            f">= {args.block_threshold} blocklist"
+        )
+    else:
+        sample = probe.pick_sample(domains, args.limit, args.seed)
+        print(
+            f"kandidat: {len(domains)} | diklasifikasi: {len(sample)} | "
+            f"TANPA bukti urlscan | model: {args.model}"
+        )
 
     rows: list[dict] = []
     failures = 0
-    urlscan = httpx.Client(
-        timeout=httpx.Timeout(30.0, connect=10.0),
-        follow_redirects=True,
-        headers={"User-Agent": USER_AGENT},
-    )
     gemini = httpx.Client(
         timeout=httpx.Timeout(120.0, connect=10.0),
         follow_redirects=True,
@@ -326,20 +364,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     )
     try:
         for index, domain in enumerate(sample, 1):
-            links: list[str] = []
-            try:
-                hits = probe.search_scans(urlscan, domain, args.links)
-                links = [
-                    f"https://urlscan.io/result/{hit['uuid']}/" for hit in hits
-                ]
-            except probe.ProbeError as exc:
-                print(f"  [{index}] {domain}: bukti gagal diambil: {exc}", file=sys.stderr)
+            links = evidence.get(domain, [])
 
             try:
                 row = classify(gemini, domain, links, args.model)
             except ClassifyError as exc:
                 failures += 1
-                print(f"  [{index}/{len(sample)}] {domain}: {exc}", file=sys.stderr)
+                print(f"  [{index}/{len(sample)}] {domain}: gemini: {exc}", file=sys.stderr)
                 if failures >= 3:
                     print("[berhenti] 3 kegagalan klasifikasi berturut-turut", file=sys.stderr)
                     break
@@ -350,6 +381,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             print(
                 f"  [{index}/{len(sample)}] {domain}: {row['score']}/100 "
                 f"-> {decide(row['score'], args.block_threshold, args.allow_threshold)}"
+                f"{'' if links else ' (tanpa bukti urlscan)'}"
             )
             if index < len(sample) and args.sleep > 0:
                 time.sleep(args.sleep)
@@ -357,7 +389,6 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("\ninterrupted", file=sys.stderr)
         return 130
     finally:
-        urlscan.close()
         gemini.close()
 
     out_dir = Path(args.out_dir)
@@ -366,6 +397,9 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     print()
     print(f"diklasifikasi  : {len(rows)}")
+    if evidence:
+        tanpa_bukti = sum(1 for r in rows if not r["links"])
+        print(f"tanpa bukti    : {tanpa_bukti}")
     print(f"blocklist      : {counts['blocklist']} (skor >= {args.block_threshold})")
     print(f"whitelist      : {counts['whitelist']} (skor <= {args.allow_threshold})")
     print(f"review         : {counts['review']}")

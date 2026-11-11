@@ -316,9 +316,24 @@ an artifact (kept 14 days), and never commits.
 
 ## LLM classification (Gemini)
 
-**Experimental, unverified output.** `classify.py` takes candidates, collects up
-to 10 urlscan.io result URLs as evidence, and asks Gemini to score each domain
-0–100 with Google Search grounding. The score is bucketed:
+**Experimental, unverified output.** Two steps, deliberately separate:
+
+```bash
+python probe.py --limit 10 --size 10 --sleep 15 --json-out probe.json
+python classify.py --evidence probe.json
+```
+
+`probe.py` collects evidence from urlscan.io; `classify.py` reads that file and
+asks Gemini to score each domain 0–100 with Google Search grounding. **classify
+never calls urlscan.io itself.**
+
+That split exists because of a real failure: classify run #1 called urlscan on
+its own and got `HTTP 429` on the first three domains, so zero domains were
+scored. Probing now happens once, with the throttle `probe.py` already has, and
+classify degrades gracefully — if the evidence file is empty or missing, it still
+scores the candidates with no evidence (and says so in the output).
+
+The score is bucketed:
 
 | Score | File | Meaning |
 |---|---|---|
@@ -355,14 +370,16 @@ Default model is `gemini-3.8-flash`. Note this is the Interactions API — not
 ### Running it
 
 ```bash
-export GEMINI_API_KEY=...          # never commit this
-python classify.py --limit 10      # writes blocklist/whitelist/review.txt
+export GEMINI_API_KEY=...                      # never commit this
+python probe.py --limit 10 --json-out probe.json
+python classify.py --evidence probe.json       # writes the three files
 ```
 
 | Flag | Default | Purpose |
 |---|---|---|
 | `--domains` | `domain.txt` | Candidate source |
-| `--limit` | `10` | Domains per run |
+| `--evidence` | — | `probe.py` JSON output to use as evidence |
+| `--limit` | `10` | Domains per run (used when there is no evidence) |
 | `--seed` | `0` | Sample seed |
 | `--links` | `10` | Evidence URLs sent per domain |
 | `--model` | `gemini-3.8-flash` | Gemini model |

@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`classify.py` no longer calls urlscan.io.** Evidence now comes from
+  `probe.py` via a new `--evidence` flag, so there is one evidence collector
+  instead of two. Motivated by classify run #1 (2026-11-11, `42846859232`): the
+  classifier searched urlscan itself, hit `HTTP 429` on the first three domains
+  and stopped with zero domains scored. `probe.py` now records every result UUID
+  under `uuids` so up to `--links` result pages can be cited per domain.
+- **`.github/workflows/classify.yml`** runs `probe.py` first, then
+  `classify.py --evidence`, and uploads `hasil/probe.json` alongside the three
+  output files. A failing probe emits a warning and classification continues
+  without evidence rather than aborting the run.
+
+### Fixed
+
+- Probe failures were attributed to Gemini and counted toward the
+  three-consecutive-failures limit, so a urlscan rate limit could stop the run
+  before the model was ever called. Evidence collection is now optional:
+  classify scores with empty evidence and labels it `(tanpa bukti urlscan)`.
+
 ### Added
 
 - **Experimental Gemini classifier (`classify.py`).** Scores candidates 0–100

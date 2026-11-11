@@ -311,19 +311,10 @@ def test_main_writes_three_files(tmp_path, monkeypatch):
     domains = tmp_path / "domain.txt"
     domains.write_text("a.com\n", encoding="utf-8")
 
-    def gemini(request: httpx.Request) -> httpx.Response:
-        return gemini_response(json.dumps({"gambling_probability": 88, "reason": "x"}))
-
-    def urlscan(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(
-            200, json={"results": [{"_id": "u1", "page": {"url": "https://a.com/"}}]}
-        )
-
-    # Satu handler melayani dua host berbeda.
     def handler(request: httpx.Request) -> httpx.Response:
-        if request.url.host == "urlscan.io":
-            return urlscan(request)
-        return gemini(request)
+        # classify.py tidak boleh menghubungi urlscan.io sama sekali.
+        assert request.url.host != "urlscan.io", "classify memanggil urlscan"
+        return gemini_response(json.dumps({"gambling_probability": 88, "reason": "x"}))
 
     monkeypatch.setattr(
         classify.httpx,
@@ -343,3 +334,103 @@ def test_main_writes_three_files(tmp_path, monkeypatch):
     assert (out / "blocklist.txt").read_text() == "a.com\n"
     assert (out / "whitelist.txt").read_text() == ""
     assert (out / "review.txt").read_text() == ""
+
+
+def test_main_reads_evidence_from_probe_json(tmp_path, monkeypatch, capsys):
+    """Bukti diambil dari file probe.py, bukan diambil ulang dari urlscan."""
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    monkeypatch.setattr(classify.time, "sleep", lambda _s: None)
+
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\nb.com\n", encoding="utf-8")
+    evidence = tmp_path / "probe.json"
+    evidence.write_text(
+        json.dumps(
+            [
+                {"domain": "a.com", "uuids": ["u1", "u2", "u3"]},
+                {"domain": "b.com", "uuids": []},
+                {"domain": "", "uuids": ["ignored"]},
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    prompts = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.host != "urlscan.io", "classify memanggil urlscan"
+        body = json.loads(request.content)
+        prompts.append(body["input"])
+        return gemini_response(json.dumps({"gambling_probability": 50, "reason": "x"}))
+
+    monkeypatch.setattr(
+        classify.httpx,
+        "Client",
+        lambda **kw: RealClient(transport=httpx.MockTransport(handler), **kw),
+    )
+
+    code = classify.main([
+        "--domains", str(domains),
+        "--evidence", str(evidence),
+        "--sleep", "0",
+        "--out-dir", str(tmp_path / "out"),
+    ])
+
+    assert code == 0
+    # Hanya domain dari file bukti yang diproses, dan entry tanpa domain dibuang.
+    assert len(prompts) == 2
+    joined = "\n".join(prompts)
+    assert "https://urlscan.io/result/u1/" in joined
+    assert "https://urlscan.io/result/u3/" in joined
+    out = capsys.readouterr().out
+    assert "bukti dari" in out
+    assert (tmp_path / "out" / "review.txt").read_text() == "a.com\nb.com\n"
+
+
+def test_main_respects_links_cap_when_reading_evidence(tmp_path, monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    monkeypatch.setattr(classify.time, "sleep", lambda _s: None)
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\n", encoding="utf-8")
+    evidence = tmp_path / "probe.json"
+    evidence.write_text(
+        json.dumps([{"domain": "a.com", "uuids": [f"u{i}" for i in range(20)]}]),
+        encoding="utf-8",
+    )
+
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["prompt"] = json.loads(request.content)["input"]
+        return gemini_response(json.dumps({"gambling_probability": 50, "reason": "x"}))
+
+    monkeypatch.setattr(
+        classify.httpx,
+        "Client",
+        lambda **kw: RealClient(transport=httpx.MockTransport(handler), **kw),
+    )
+
+    classify.main([
+        "--domains", str(domains),
+        "--evidence", str(evidence),
+        "--links", "3",
+        "--sleep", "0",
+        "--out-dir", str(tmp_path / "out"),
+    ])
+
+    assert "result/u2/" in seen["prompt"]
+    assert "result/u3/" not in seen["prompt"], "--links harus membatasi jumlah bukti"
+
+
+def test_main_rejects_missing_evidence_file(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\n", encoding="utf-8")
+
+    code = classify.main([
+        "--domains", str(domains),
+        "--evidence", str(tmp_path / "nope.json"),
+    ])
+
+    assert code == 1
+    assert "gagal membaca bukti" in capsys.readouterr().err

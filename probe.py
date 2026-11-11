@@ -243,7 +243,19 @@ def main(argv: Optional[list[str]] = None) -> int:
     try:
         for index, domain in enumerate(sample, 1):
             try:
-                row = probe(client, domain, args.size)
+                # Satu request saja per domain. `probe()` dan `search_scans()`
+                # memakai `_fetch_results()` yang sama, jadi memanggil keduanya
+                # berarti dua request untuk kuota yang sama-sama terbatas.
+                hits = search_scans(client, domain, args.size)
+                row = {
+                    "domain": domain,
+                    "total": len(hits),
+                    "has_more": False,
+                    "first_uuid": hits[0]["uuid"] if hits else "",
+                    "first_url": hits[0]["url"] if hits else "",
+                    "first_scanned": hits[0]["scanned"] if hits else "",
+                    "uuids": [h["uuid"] for h in hits],
+                }
             except ProbeError as exc:
                 failures += 1
                 print(f"  [{index}/{len(sample)}] {domain}: {exc}", file=sys.stderr)
