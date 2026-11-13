@@ -306,10 +306,13 @@ python probe.py --limit 50 --size 5 --sleep 4 --seed 42 --json-out probe.json
 Set `PROBE_API_KEY` to send an `API-Key` header. Without it the script still
 runs — the endpoint is public — but you get the anonymous quota.
 
-In CI, `.github/workflows/urlscan-probe.yml` runs daily at `11 5 * * *` and on
-manual dispatch, with `limit`/`size`/`sleep`/`seed` as dispatch inputs. It sends
-`secrets.URLSCAN_API_KEY` when that secret exists, uploads `probe-result.json` as
-an artifact (kept 14 days), and never commits.
+In CI, `.github/workflows/urlscan-probe.yml` runs on manual dispatch only — the
+daily scheduled probing lives in `urlscan-evidence.yml`, which commits its
+results to the repo. Two daily jobs on the same seed would probe the exact
+same 25 domains twice and waste urlscan.io quota, so the read-only probe
+workflow was left manual, with a larger budget for one-off deep runs. It
+sends `secrets.URLSCAN_API_KEY` when that secret exists, uploads
+`probe-result.json` as an artifact (kept 14 days), and never commits.
 
 ### The evidence ledger (`urlscan-evidence.json`)
 

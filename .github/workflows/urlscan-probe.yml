@@ -10,28 +10,31 @@ name: urlscan-probe
 #     dipublikasikan. Menyapu semuanya per run tidak realistis, jadi yang
 #     diambil hanya sampel kecil.
 #
+# Jadwal harian ada di workflow lain: `urlscan-evidence.yml` yang meng-commit
+# hasilnya ke repo sebagai `urlscan-evidence.json`. Workflow ini sengaja
+# TIDAK dijadwalkan -- kalau keduanya jalan harian dengan seed yang sama, dua
+# job itu akan mem-probe domain yang persis sama dan kuota terbuang dua kali.
+# Yang tersisa di sini: probe mendalam yang dijalankan manual, dengan kuota
+# lebih besar, dan hasilnya hanya jadi artifact.
+#
 # Hasil scan adalah BUKTI, bukan vonis: domain yang punya scan belum tentu
 # situs judol, dan workflow ini tidak menulis apa pun ke repo.
 
 on:
-  schedule:
-    # 05:11 UTC -- sengaja digeser dari jadwal ct-grab (23 */6 * * *) supaya
-    # kedua job tidak berebut resource runner di menit yang sama.
-    - cron: '11 5 * * *'
   workflow_dispatch:
     inputs:
       limit:
         description: 'Jumlah domain yang diperiksa'
         required: false
-        default: '25'
+        default: '50'
       size:
         description: 'Scan per domain yang diminta'
         required: false
-        default: '1'
+        default: '5'
       sleep:
         description: 'Jeda antar request (detik)'
         required: false
-        default: '6'
+        default: '4'
       seed:
         description: 'Seed sampel (run dengan seed sama = himpunan sama)'
         required: false
@@ -74,11 +77,11 @@ jobs:
           INPUT_SLEEP: ${{ inputs.sleep }}
           INPUT_SEED: ${{ inputs.seed }}
         run: |
-          # workflow_dispatch memberi inputs.*; schedule tidak (kosong).
+          # workflow_dispatch mengisi inputs.*.
           # Default di sini harus sama dengan default workflow_dispatch.
-          LIMIT="${INPUT_LIMIT:-25}"
-          SIZE="${INPUT_SIZE:-1}"
-          SLEEP="${INPUT_SLEEP:-6}"
+          LIMIT="${INPUT_LIMIT:-50}"
+          SIZE="${INPUT_SIZE:-5}"
+          SLEEP="${INPUT_SLEEP:-4}"
           SEED="${INPUT_SEED:-0}"
 
           echo "limit=$LIMIT size=$SIZE sleep=$SLEEP seed=$SEED"
@@ -86,6 +89,7 @@ jobs:
 
           # Jaga-jaga: input dari workflow_dispatch tetap harus numerik.
           case "$LIMIT" in ''|*[!0-9]*) echo "limit tidak valid: $LIMIT" >&2; exit 2;; esac
+          case "$SIZE"  in ''|*[!0-9]*) echo "size tidak valid: $SIZE" >&2; exit 2;; esac
           case "$SLEEP" in ''|*[!0-9]*) echo "sleep tidak valid: $SLEEP" >&2; exit 2;; esac
 
           if [ -n "$URLSCAN_API_KEY" ]; then
