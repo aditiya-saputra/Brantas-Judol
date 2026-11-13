@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": 1794581468,
+  "generated_at": 1794581749,
   "domains": [
     {
       "domain": "casino9173.buzz",
@@ -35,6 +35,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "ebjudim-bnb37549.us-west-2.aws.privatelink.snowflake.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581749
+    },
+    {
       "domain": "edge.daddycasino-bvq.top",
       "total": 0,
       "uuids": [],
@@ -53,6 +62,24 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "gesloten.pensioenbijconnectionsystems.nl",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581749
+    },
+    {
+      "domain": "luckyboomcasino.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581749
+    },
+    {
       "domain": "mail.riobetcasino-352.top",
       "total": 0,
       "uuids": [],
@@ -69,6 +96,33 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "only1.togelkds.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581749
+    },
+    {
+      "domain": "ontogelz3.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581749
+    },
+    {
+      "domain": "slotsavvyspectacle.info",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581749
     },
     {
       "domain": "stakescasinoonline.de",
