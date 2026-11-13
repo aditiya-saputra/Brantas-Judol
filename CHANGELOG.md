@@ -54,6 +54,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **GitHub Actions bumped to Node 24.** `actions/checkout@v4`,
+  `actions/setup-python@v5` and `actions/upload-artifact@v4` all target
+  Node.js 20, which GitHub deprecated — the runner was already forcing them
+  onto Node.js 24 and warning on every run. All three moved to their current
+  major (`@v7`); the inputs used here are unchanged in v7.
+- **`urlscan-probe.yml` is manual dispatch only.** `urlscan-evidence.yml`
+  already probes daily and commits the result, so leaving the old probe
+  workflow on a daily schedule meant both jobs ran with the same default seed
+  and probed the exact same 25 domains twice a day. The read-only probe
+  workflow keeps a larger budget for one-off deep runs and no longer spends
+  quota on a schedule.
 - **Experimental Gemini classifier (`classify.py`).** Scores candidates 0–100
   using up to 10 urlscan.io result URLs as evidence plus Google Search grounding,
   then buckets them into `blocklist.txt`, `whitelist.txt` or `review.txt`.
