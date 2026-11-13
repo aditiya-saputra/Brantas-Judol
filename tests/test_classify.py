@@ -210,6 +210,117 @@ def test_classify_does_not_retry_on_400(monkeypatch):
 
 
 # --------------------------------------------------------------------------
+# load_evidence: format list (probe.py) dan format ledger (repo)
+# --------------------------------------------------------------------------
+
+def test_load_evidence_reads_plain_list(tmp_path):
+    path = tmp_path / "probe.json"
+    path.write_text(
+        json.dumps([{"domain": "a.com", "uuids": ["u1", "u2"]}]),
+        encoding="utf-8",
+    )
+
+    evidence = classify.load_evidence(str(path))
+
+    assert evidence == {"a.com": ["https://urlscan.io/result/u1/",
+                                   "https://urlscan.io/result/u2/"]}
+
+
+def test_load_evidence_reads_ledger_object(tmp_path):
+    """Ledger yang di-commit repo harus bisa langsung dipakai sebagai bukti."""
+    path = tmp_path / "urlscan-evidence.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema": 1,
+                "generated_at": 100,
+                "domains": [
+                    {"domain": "a.com", "total": 1, "uuids": ["u1"],
+                     "first_url": "https://a.com/", "checked_at": 100},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    evidence = classify.load_evidence(str(path))
+
+    assert evidence == {"a.com": ["https://urlscan.io/result/u1/"]}
+
+
+def test_load_evidence_respects_links_cap(tmp_path):
+    path = tmp_path / "ev.json"
+    path.write_text(
+        json.dumps([{"domain": "a.com", "uuids": [f"u{i}" for i in range(10)]}]),
+        encoding="utf-8",
+    )
+
+    evidence = classify.load_evidence(str(path), links=3)
+
+    assert len(evidence["a.com"]) == 3
+
+
+def test_load_evidence_rejects_unknown_format(tmp_path):
+    path = tmp_path / "ev.json"
+    path.write_text(json.dumps("bukan daftar"), encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        classify.load_evidence(str(path))
+
+
+def test_load_evidence_drops_entries_without_domain(tmp_path):
+    path = tmp_path / "ev.json"
+    path.write_text(
+        json.dumps([{"domain": "", "uuids": ["u1"]}]), encoding="utf-8"
+    )
+
+    assert classify.load_evidence(str(path)) == {}
+
+
+def test_main_samples_evidence_when_limit_is_smaller(tmp_path, monkeypatch):
+    """Ledger bisa jauh lebih besar dari --limit -- yang dinilai harus sampel."""
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    monkeypatch.setattr(classify.time, "sleep", lambda _s: None)
+
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\nb.com\nc.com\n", encoding="utf-8")
+    evidence = tmp_path / "ev.json"
+    evidence.write_text(
+        json.dumps(
+            [
+                {"domain": "a.com", "uuids": ["u1"]},
+                {"domain": "b.com", "uuids": ["u2"]},
+                {"domain": "c.com", "uuids": ["u3"]},
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    prompts = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        prompts.append(json.loads(request.content)["input"])
+        return gemini_response(json.dumps({"gambling_probability": 50, "reason": "x"}))
+
+    monkeypatch.setattr(
+        classify.httpx,
+        "Client",
+        lambda **kw: RealClient(transport=httpx.MockTransport(handler), **kw),
+    )
+
+    code = classify.main([
+        "--domains", str(domains),
+        "--evidence", str(evidence),
+        "--limit", "2",
+        "--sleep", "0",
+        "--out-dir", str(tmp_path / "out"),
+    ])
+
+    assert code == 0
+    assert len(prompts) == 2
+
+
+# --------------------------------------------------------------------------
 # search_scans (probe.py)
 # --------------------------------------------------------------------------
 

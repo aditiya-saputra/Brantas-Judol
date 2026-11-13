@@ -29,6 +29,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **The evidence ledger `urlscan-evidence.json`, committed to the repo.**
+  `probe.py` gains `--merge-out`: instead of overwriting, each run merges its
+  urlscan.io search results into a ledger keyed by domain
+  (`{"schema": 1, "generated_at": <unix>, "domains": [...]}`). `uuids` are
+  **unioned**, never overwritten, so evidence found once is never lost; domains
+  are sorted and each domain is capped at 50 uuid, so a repo diff only appears
+  when the data really changed. Zero-hit domains are kept deliberately — they
+  are the record that a domain was checked and nothing was found.
+- **New workflow `.github/workflows/urlscan-evidence.yml`** — daily at
+  `17 4 * * *` plus manual dispatch. Runs `pytest`, then `probe.py
+  --merge-out urlscan-evidence.json`, then commits the ledger **only if it
+  changed**. `permissions: contents: write`, concurrency serialized with
+  `cancel-in-progress: false`. It writes nothing but read-only urlscan.io
+  search results — no LLM output, no blocklist.
+- `classify.py` now reads the committed ledger directly, so the classification
+  job spends **zero** urlscan.io quota on a normal day. It falls back to
+  running `probe.py` itself when the ledger is absent (first run). The
+  scheduled classify run uses a day-of-year seed so consecutive days do not
+  judge the same domains; manual dispatch can still pin the seed.
+- 18 new tests on `httpx.MockTransport` — no network — covering the ledger
+  load/merge/write path, the union rule, the per-domain cap, deterministic
+  output, and reading both evidence formats in `classify.py`.
+
+### Changed
+
 - **Experimental Gemini classifier (`classify.py`).** Scores candidates 0–100
   using up to 10 urlscan.io result URLs as evidence plus Google Search grounding,
   then buckets them into `blocklist.txt`, `whitelist.txt` or `review.txt`.

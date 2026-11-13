@@ -193,6 +193,22 @@ pytest → grab.py → sort -u domain.txt → commit domain.txt + ct.db
 Concurrency is serialized (`cancel-in-progress: false`) so two runs never race on
 the cursors. If nothing changed, no commit is made.
 
+`.github/workflows/urlscan-evidence.yml` runs daily at `17 4 * * *`:
+
+```
+pytest → probe.py --merge-out → commit urlscan-evidence.json (only if changed)
+```
+
+It is the only workflow besides `ct-grab.yml` that holds `contents: write`, and
+the only thing it writes is the read-only urlscan.io search result. The ledger
+it produces is what `classify.yml` reads as evidence.
+
+`.github/workflows/classify.yml` runs daily at `41 7 * * *` plus manual
+dispatch, needs the `GEMINI_API_KEY` secret, and is `contents: read`. It uses
+the committed `urlscan-evidence.json` when that file exists and falls back to
+running `probe.py` itself otherwise — so it never spends urlscan.io quota on a
+normal day.
+
 ---
 
 ## Roadmap
@@ -285,6 +301,7 @@ python probe.py --limit 50 --size 5 --sleep 4 --seed 42 --json-out probe.json
 | `--seed` | `0` | Sample seed — same seed, same set |
 | `--max-failures` | `3` | Stop after N consecutive failed requests |
 | `--json-out` | — | Write results as JSON |
+| `--merge-out` | — | Merge results into the committed evidence ledger |
 
 Set `PROBE_API_KEY` to send an `API-Key` header. Without it the script still
 runs — the endpoint is public — but you get the anonymous quota.
@@ -293,6 +310,33 @@ In CI, `.github/workflows/urlscan-probe.yml` runs daily at `11 5 * * *` and on
 manual dispatch, with `limit`/`size`/`sleep`/`seed` as dispatch inputs. It sends
 `secrets.URLSCAN_API_KEY` when that secret exists, uploads `probe-result.json` as
 an artifact (kept 14 days), and never commits.
+
+### The evidence ledger (`urlscan-evidence.json`)
+
+`probe.py` can merge its results into a ledger file that **is committed to this
+repo**. That ledger, not a per-run artifact, is what `classify.py` reads as
+evidence — so the classification job spends **zero** urlscan.io quota.
+
+```bash
+python probe.py --limit 25 --merge-out urlscan-evidence.json
+```
+
+| | |
+|---|---|
+| Format | `{"schema": 1, "generated_at": <unix>, "domains": [...]}` |
+| Keyed by | domain |
+| Per domain | `total`, `uuids[]`, `first_url`, `first_scanned`, `checked_at` |
+| Merge rule | `uuids` are **unioned**, never overwritten — evidence found once stays |
+| Cap | 50 uuid per domain |
+| Ordering | domains sorted, so a repo diff appears only when the data really changed |
+
+`domains_listed` in `stats.json` counts candidates; the ledger counts what was
+actually **checked** against urlscan.io, including the ones with no scan at
+all (`total: 0`). Those zero-hit entries are deliberate: they are the record
+that a domain was probed and nothing was found.
+
+The ledger holds URLs, page titles, and domains only. No DOM content, no
+screenshots — the same restriction `classify.py` already enforces.
 
 ### Constraints for whoever builds the rest
 
@@ -390,7 +434,11 @@ python classify.py --evidence probe.json       # writes the three files
 | `--json-out` | — | Full results including `reason` |
 
 In CI, `.github/workflows/classify.yml` runs daily at `41 7 * * *` plus manual
-dispatch, needs the `GEMINI_API_KEY` secret, and is `contents: read`.
+dispatch, needs the `GEMINI_API_KEY` secret, and is `contents: read`. Evidence
+comes from the committed ledger `urlscan-evidence.json` when it exists; the
+workflow then classifies a `--limit` sample of the domains in that ledger,
+using a day-of-year seed so consecutive days do not judge the same domains.
+Manual dispatch can pin the seed for reproducibility.
 
 ### Safety properties worth keeping
 

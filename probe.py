@@ -4,14 +4,20 @@
 Tahap probing belum dibangun. Skrip ini adalah langkah pertama yang sengaja
 dibatasi: hanya mencari apakah sebuah domain PERNAH discan urlscan.io, lalu
 mencetak ringkasannya. Tidak ada klasifikasi, tidak ada blocklist, tidak ada
-commit -- hasilnya cuma log Actions.
+commit dari skrip ini sendiri.
 
-Kenapa terpisah dari grab.py dan tidak dipanggil CI terjadwal:
+Kenapa terpisah dari grab.py:
   * Kandidat di domain.txt ~97 ribu dan urlscan.io punya kuota; menyapu
     semuanya per run tidak realistis.
   * ct-grab.yml memegang `contents: write` + `git push`. Menambah panggilan
     API pihak ketiga di sana menambah mode gagal baru pada job yang mengubah
     state.
+
+Dua mode output:
+  * `--json-out`  -> hasil mentah satu run (artifact, tidak di-commit).
+  * `--merge-out` -> digabung ke ledger bukti `urlscan-evidence.json` yang
+    di-commit ke repo. Ledger inilah yang jadi sumber bukti untuk classify.py,
+    jadi job klasifikasi tidak perlu memakai kuota urlscan sendiri.
 
 Endpoint terverifikasi 2026-11-10:
   GET https://urlscan.io/api/v1/search/?q=domain:<domain>&size=<n>
@@ -173,6 +179,141 @@ def summarize(rows: list[dict]) -> str:
     return "\n".join(lines)
 
 
+# --------------------------------------------------------------------------
+# Ledger bukti (yang di-commit ke repo)
+# --------------------------------------------------------------------------
+
+EVIDENCE_SCHEMA = 1
+
+# Batas uuid per domain. Scan urlscan.io untuk satu domain bisa sangat banyak,
+# dan yang disimpan ke repo tidak perlu lengkap -- cukup beberapa halaman hasil
+# terbaru untuk jadi rujukan.
+MAX_UUIDS_PER_DOMAIN = 50
+
+
+def load_evidence(path: str) -> dict[str, dict]:
+    """Baca ledger bukti lama -> {domain: {...}}.
+
+    Dua format diterima:
+      * objek {"schema": N, "domains": [...]}  -> format ledger
+      * list  [{...}, ...]                     -> format probe.py --json-out
+
+    File yang rusak atau tidak terbaca dianggap ledger kosong: satu file
+    json yang gagal baca tidak boleh menggagalkan seluruh run.
+    """
+    try:
+        with open(path, encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, ValueError):
+        return {}
+
+    if isinstance(payload, dict):
+        items = payload.get("domains") or []
+    elif isinstance(payload, list):
+        items = payload
+    else:
+        return {}
+
+    ledger: dict[str, dict] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        domain = str(item.get("domain") or "").strip().lower()
+        if not domain:
+            continue
+        uuids = [str(u) for u in (item.get("uuids") or []) if u]
+        if not uuids and item.get("first_uuid"):
+            uuids = [str(item["first_uuid"])]
+        ledger[domain] = {
+            "total": int(item.get("total") or 0),
+            "uuids": uuids[:MAX_UUIDS_PER_DOMAIN],
+            "first_url": str(item.get("first_url") or ""),
+            "first_scanned": str(item.get("first_scanned") or ""),
+            "checked_at": int(item.get("checked_at") or 0),
+        }
+    return ledger
+
+
+def merge_evidence(
+    ledger: dict[str, dict],
+    rows: list[dict],
+    checked_at: int,
+) -> dict[str, dict]:
+    """Gabungkan baris hasil probe ke ledger lama.
+
+    uuids digabung (union), bukan ditimpa: bukti yang pernah ditemukan tetap
+    bernilai walau scan lama tidak muncul lagi di hasil pencarian hari ini.
+    """
+    merged = {key: dict(value) for key, value in ledger.items()}
+
+    for row in rows:
+        domain = str(row.get("domain") or "").strip().lower()
+        if not domain:
+            continue
+        old = merged.get(domain) or {}
+        uuids = [str(u) for u in (old.get("uuids") or []) if u]
+        for uid in row.get("uuids") or []:
+            uid = str(uid)
+            if uid and uid not in uuids:
+                uuids.append(uid)
+        merged[domain] = {
+            "total": max(int(old.get("total") or 0), int(row.get("total") or 0)),
+            "uuids": uuids[:MAX_UUIDS_PER_DOMAIN],
+            "first_url": str(row.get("first_url") or old.get("first_url") or ""),
+            "first_scanned": str(
+                row.get("first_scanned") or old.get("first_scanned") or ""
+            ),
+            "checked_at": checked_at,
+        }
+    return merged
+
+
+def write_evidence(
+    path: str,
+    ledger: dict[str, dict],
+    generated_at: int,
+) -> bool:
+    """Tulis ledger ke disk. True kalau isinya berubah.
+
+    Isi ditulis deterministik (domain terurut) supaya diff di repo hanya
+    muncul kalau buktinya memang baru.
+    """
+    domains_out = []
+    for domain, data in sorted(ledger.items()):
+        # Batas ditegakkan lagi di sini: ini penulis terakhir, jadi ledger
+        # yang ditulis tidak boleh lebih besar dari kapasitas.
+        uuids = list(data.get("uuids") or [])[:MAX_UUIDS_PER_DOMAIN]
+        domains_out.append(
+            {
+                "domain": domain,
+                "total": data.get("total", 0),
+                "uuids": uuids,
+                "first_uuid": uuids[0] if uuids else "",
+                "first_url": data.get("first_url", ""),
+                "first_scanned": data.get("first_scanned", ""),
+                "checked_at": data.get("checked_at", 0),
+            }
+        )
+
+    payload = {
+        "schema": EVIDENCE_SCHEMA,
+        "generated_at": generated_at,
+        "domains": domains_out,
+    }
+    text = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+
+    try:
+        with open(path, encoding="utf-8") as handle:
+            if handle.read() == text:
+                return False
+    except OSError:
+        pass
+
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(text)
+    return True
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="probe",
@@ -203,6 +344,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
         type=int,
         default=3,
         help="berhenti setelah N request gagal berturut-turut (default: 3)",
+    )
+    parser.add_argument(
+        "--merge-out",
+        help=(
+            "ledger bukti yang di-commit ke repo; hasil run ini digabung "
+            "ke dalamnya (default: tanpa merge)"
+        ),
     )
     parser.add_argument("--json-out", help="simpan hasil sebagai JSON (opsional)")
     return parser
@@ -285,6 +433,20 @@ def main(argv: Optional[list[str]] = None) -> int:
         with open(args.json_out, "w", encoding="utf-8") as handle:
             json.dump(rows, handle, indent=2, ensure_ascii=False)
         print(f"\nhasil JSON: {args.json_out}")
+
+    if args.merge_out:
+        # Ledger bukti yang ikut di-commit ke repo. Bukti yang pernah
+        # ditemukan tidak hilang: uuids digabung, bukan ditimpa.
+        checked_at = int(time.time())
+        ledger = merge_evidence(load_evidence(args.merge_out), rows, checked_at)
+        if ledger or os.path.exists(args.merge_out):
+            changed = write_evidence(args.merge_out, ledger, checked_at)
+            print(
+                f"ledger       : {args.merge_out} ({len(ledger)} domain, "
+                f"{'berubah' if changed else 'tidak berubah'})"
+            )
+        else:
+            print("ledger       : dilewati (tidak ada bukti baru)")
 
     return 0 if rows else 1
 

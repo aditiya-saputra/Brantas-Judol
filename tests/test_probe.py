@@ -168,6 +168,206 @@ def test_probe_sends_domain_query_and_size(monkeypatch):
 
 
 # --------------------------------------------------------------------------
+# ledger bukti (yang di-commit ke repo)
+# --------------------------------------------------------------------------
+
+def test_load_evidence_reads_ledger_object_format(tmp_path):
+    path = tmp_path / "ev.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema": 1,
+                "generated_at": 100,
+                "domains": [
+                    {"domain": "a.com", "total": 2, "uuids": ["u1", "u2"],
+                     "first_url": "https://a.com/", "first_scanned": "t1",
+                     "checked_at": 100},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    ledger = probe.load_evidence(str(path))
+
+    assert set(ledger) == {"a.com"}
+    assert ledger["a.com"]["uuids"] == ["u1", "u2"]
+    assert ledger["a.com"]["total"] == 2
+    assert ledger["a.com"]["first_url"] == "https://a.com/"
+
+
+def test_load_evidence_reads_plain_list_format(tmp_path):
+    """Format lama (probe.py --json-out) harus tetap bisa dibaca."""
+    path = tmp_path / "ev.json"
+    path.write_text(
+        json.dumps([{"domain": "a.com", "uuids": ["u1"], "total": 1}]),
+        encoding="utf-8",
+    )
+
+    ledger = probe.load_evidence(str(path))
+
+    assert ledger["a.com"]["uuids"] == ["u1"]
+
+
+def test_load_evidence_survives_broken_file(tmp_path):
+    """File rusak tidak boleh menggagalkan run -- ledger dianggap kosong."""
+    path = tmp_path / "ev.json"
+    path.write_text("{bukan json", encoding="utf-8")
+
+    assert probe.load_evidence(str(path)) == {}
+
+
+def test_load_evidence_survives_missing_file(tmp_path):
+    assert probe.load_evidence(str(tmp_path / "nope.json")) == {}
+
+
+def test_load_evidence_drops_entries_without_domain(tmp_path):
+    path = tmp_path / "ev.json"
+    path.write_text(
+        json.dumps([{"domain": "", "uuids": ["u1"]}, {"uuids": ["u2"]}]),
+        encoding="utf-8",
+    )
+
+    assert probe.load_evidence(str(path)) == {}
+
+
+def test_merge_evidence_unions_uuids():
+    """Bukti lama tidak hilang walau scan baru tidak memuatnya lagi."""
+    old = {
+        "a.com": {
+            "total": 2,
+            "uuids": ["u1", "u2"],
+            "first_url": "https://a.com/",
+            "first_scanned": "t1",
+            "checked_at": 100,
+        }
+    }
+    rows = [{"domain": "a.com", "total": 1, "uuids": ["u2", "u3"],
+             "first_url": "https://a.com/x", "first_scanned": "t2"}]
+
+    merged = probe.merge_evidence(old, rows, checked_at=200)
+
+    assert merged["a.com"]["uuids"] == ["u1", "u2", "u3"]
+    assert merged["a.com"]["total"] == 2, "total tertinggi harus dipertahankan"
+    assert merged["a.com"]["checked_at"] == 200
+    assert merged["a.com"]["first_scanned"] == "t2"
+
+
+def test_merge_evidence_adds_new_domain():
+    merged = probe.merge_evidence({}, [{"domain": "b.com", "uuids": ["u9"]}], 200)
+
+    assert merged["b.com"]["uuids"] == ["u9"]
+
+
+def test_merge_evidence_ignores_rows_without_domain():
+    assert probe.merge_evidence({}, [{"domain": "", "uuids": ["u1"]}], 200) == {}
+
+
+def test_write_evidence_is_deterministic(tmp_path):
+    path = tmp_path / "ev.json"
+    ledger = {
+        "b.com": {"total": 1, "uuids": ["u2"], "first_url": "", "first_scanned": "",
+                   "checked_at": 1},
+        "a.com": {"total": 1, "uuids": ["u1"], "first_url": "", "first_scanned": "",
+                   "checked_at": 1},
+    }
+
+    assert probe.write_evidence(str(path), ledger, 999) is True
+    first = path.read_text(encoding="utf-8")
+
+    # domain harus terurut supaya diff di repo hanya muncul kalau data baru
+    payload = json.loads(first)
+    assert [d["domain"] for d in payload["domains"]] == ["a.com", "b.com"]
+    assert payload["schema"] == 1
+
+    # tulis ulang dengan isi sama -> tidak dianggap berubah
+    assert probe.write_evidence(str(path), ledger, 999) is False
+    assert path.read_text(encoding="utf-8") == first
+
+
+def test_write_evidence_caps_uuids_per_domain(tmp_path):
+    path = tmp_path / "ev.json"
+    ledger = {
+        "a.com": {
+            "total": 999,
+            "uuids": [f"u{i}" for i in range(probe.MAX_UUIDS_PER_DOMAIN + 20)],
+            "first_url": "",
+            "first_scanned": "",
+            "checked_at": 1,
+        }
+    }
+
+    probe.write_evidence(str(path), ledger, 1)
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert len(payload["domains"][0]["uuids"]) == probe.MAX_UUIDS_PER_DOMAIN
+
+
+def test_main_merges_into_ledger(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    domains = tmp_path / "domain.txt"
+    domains.write_text("rtp-a.com\nrtp-b.com\n", encoding="utf-8")
+    ledger = tmp_path / "urlscan-evidence.json"
+
+    fake = FakeUrlscan(hits={"rtp-a.com"})
+    monkeypatch.setattr(
+        probe.httpx, "Client", lambda **kw: fake.client()
+    )
+
+    code = probe.main([
+        "--domains", str(domains),
+        "--limit", "2",
+        "--sleep", "0",
+        "--merge-out", str(ledger),
+    ])
+
+    assert code == 0
+    payload = json.loads(ledger.read_text(encoding="utf-8"))
+    assert payload["schema"] == 1
+    assert {d["domain"] for d in payload["domains"]} == {"rtp-a.com", "rtp-b.com"}
+    hit = next(d for d in payload["domains"] if d["domain"] == "rtp-a.com")
+    assert hit["uuids"] == ["uuid-rtp-a.com"]
+    assert "ledger" in capsys.readouterr().out
+
+
+def test_main_merging_keeps_previous_evidence(tmp_path, monkeypatch):
+    """Run kedua tidak boleh menghapus bukti dari run pertama."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    domains = tmp_path / "domain.txt"
+    domains.write_text("rtp-a.com\nrtp-b.com\n", encoding="utf-8")
+    ledger = tmp_path / "urlscan-evidence.json"
+    ledger.write_text(
+        json.dumps(
+            {
+                "schema": 1,
+                "generated_at": 1,
+                "domains": [
+                    {"domain": "rtp-z.com", "total": 1, "uuids": ["u-old"],
+                     "checked_at": 1}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    fake = FakeUrlscan(hits={"rtp-a.com"})
+    monkeypatch.setattr(probe.httpx, "Client", lambda **kw: fake.client())
+
+    probe.main([
+        "--domains", str(domains),
+        "--limit", "2",
+        "--sleep", "0",
+        "--merge-out", str(ledger),
+    ])
+
+    payload = json.loads(ledger.read_text(encoding="utf-8"))
+    domains_seen = {d["domain"]: d for d in payload["domains"]}
+    assert "rtp-z.com" in domains_seen
+    assert domains_seen["rtp-z.com"]["uuids"] == ["u-old"]
+    assert "rtp-a.com" in domains_seen
+
+
+# --------------------------------------------------------------------------
 # ringkasan
 # --------------------------------------------------------------------------
 

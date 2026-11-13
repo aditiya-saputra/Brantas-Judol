@@ -154,6 +154,43 @@ def _extract_text(payload: dict) -> str:
     raise ClassifyError("respons tidak punya blok teks")
 
 
+def load_evidence(path: str, links: int = DEFAULT_LINKS) -> dict[str, list[str]]:
+    """Baca file bukti -> {domain: [url halaman hasil urlscan]}.
+
+    Dua format diterima:
+      * list -> output mentah `probe.py --json-out`
+      * dict -> ledger `urlscan-evidence.json` ({"schema": N, "domains": [...]})
+
+    Format ledger dipakai workflow urlscan-evidence: hasil pencarian urlscan
+    di-commit ke repo, lalu file itu yang jadi sumber bukti di sini. Dengan
+    begitu job klasifikasi tidak memakai kuota urlscan sama sekali.
+    """
+    with open(path, encoding="utf-8") as handle:
+        payload = json.load(handle)
+
+    if isinstance(payload, dict):
+        items = payload.get("domains") or []
+    elif isinstance(payload, list):
+        items = payload
+    else:
+        raise ValueError("format bukti tidak dikenal")
+
+    evidence: dict[str, list[str]] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        domain = str(item.get("domain") or "").strip().lower()
+        if not domain:
+            continue
+        uuids = item.get("uuids") or (
+            [item.get("first_uuid")] if item.get("first_uuid") else []
+        )
+        evidence[domain] = [
+            f"https://urlscan.io/result/{uid}/" for uid in uuids if uid
+        ][:links]
+    return evidence
+
+
 def classify(
     client: httpx.Client,
     domain: str,
@@ -325,16 +362,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     evidence: dict[str, list[str]] = {}
     if args.evidence:
         try:
-            with open(args.evidence, encoding="utf-8") as handle:
-                for item in json.load(handle):
-                    domain = str(item.get("domain") or "")
-                    if not domain:
-                        continue
-                    evidence[domain] = [
-                        f"https://urlscan.io/result/{uid}/"
-                        for uid in (item.get("uuids") or [item.get("first_uuid") or ""])
-                        if uid
-                    ][: args.links]
+            evidence = load_evidence(args.evidence, args.links)
         except (OSError, ValueError) as exc:
             print(f"[fatal] gagal membaca bukti {args.evidence}: {exc}", file=sys.stderr)
             return 1
@@ -342,10 +370,14 @@ def main(argv: Optional[list[str]] = None) -> int:
     # Tanpa --evidence, klasifikasi tetap jalan memakai kandidat dari
     # --domains dan mengirim bukti kosong (skor cenderung lebih rendah).
     if evidence:
-        sample = list(evidence)
+        # Bukti bisa jauh lebih banyak daripada --limit (ledger repo berisi
+        # hasil probe dari banyak run). Ambil sampel supaya job tetap cheap
+        # dan tidak selalu menilai domain yang sama.
+        sample = probe.pick_sample(list(evidence), args.limit, args.seed)
         print(
-            f"bukti dari {args.evidence}: {len(sample)} domain | "
-            f"model: {args.model} | ambang: <= {args.allow_threshold} whitelist, "
+            f"bukti dari {args.evidence}: {len(evidence)} domain "
+            f"(diambil {len(sample)}) | model: {args.model} | "
+            f"ambang: <= {args.allow_threshold} whitelist, "
             f">= {args.block_threshold} blocklist"
         )
     else:
