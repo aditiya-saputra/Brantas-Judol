@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "generated_at": 1794581468,
+  "domains": [
+    {
+      "domain": "casino9173.buzz",
+      "total": 1,
+      "uuids": [
+        "019f027f-b338-70aa-a76e-6d0ab312a948"
+      ],
+      "first_uuid": "019f027f-b338-70aa-a76e-6d0ab312a948",
+      "first_url": "https://casino9173.buzz/",
+      "first_scanned": "2026-06-26T05:55:56.842Z",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "console.yard-free-casino.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "dataslot.cc",
+      "total": 2,
+      "uuids": [
+        "01a15f31-5462-7407-9530-511db806ad33",
+        "01a02f5c-fafc-767c-b0e6-7b24fc1a5fdf"
+      ],
+      "first_uuid": "01a15f31-5462-7407-9530-511db806ad33",
+      "first_url": "https://verify-label.dataslot.cc/",
+      "first_scanned": "2026-10-21T16:00:41.820Z",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "edge.daddycasino-bvq.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "ffq-ui-rtp-pet.herokuapp.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "mail.riobetcasino-352.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "miraxcasino.casino.cori.infofozzzzzz.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581468
+    },
+    {
+      "domain": "stakescasinoonline.de",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794581468
+    }
+  ]
+}
