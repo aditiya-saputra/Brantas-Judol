@@ -86,7 +86,10 @@ jobs:
           LIMIT="${INPUT_LIMIT:-10}"
           BLOCK="${INPUT_BLOCK:-80}"
           ALLOW="${INPUT_ALLOW:-20}"
-          SEED="${INPUT_SEED:-0}"
+          # Run terjadwal memakai seed hari-ini (day-of-year) supaya tiap hari
+          # domain yang dinilai berbeda. Run manual bisa mengunci seed lewat
+          # input, jadi hasilnya bisa direproduksi.
+          SEED="${INPUT_SEED:-$(date -u +%j)}"
 
           echo "limit=$LIMIT block=$BLOCK allow=$ALLOW seed=$SEED"
 
@@ -104,10 +107,19 @@ jobs:
           # itu. Sebelumnya classify memanggil urlscan langsung dan run #1
           # kena HTTP 429 di tiga domain pertama sehingga nol terklasifikasi.
           #
+          # Kalau ledger bukti sudah ada di repo (workflow urlscan-evidence),
+          # ledger itu yang dipakai: job ini jadi tidak memakai kuota urlscan
+          # sama sekali, dan bukti yang terkumpul dari banyak run ikut
+          # leveraged. Kalau ledger belum ada (run pertama), probe dijalankan
+          # di sini seperti sebelumnya.
+          #
           # Probe dibiarkan gagal tanpa menghentikan job: bukti bersifat
           # opsional, dan klasifikasi tanpa bukti tetap menghasilkan output
           # (dengan skor yang cenderung lebih rendah).
-          if python probe.py \
+          if [ -s urlscan-evidence.json ]; then
+            echo "bukti: ledger repo urlscan-evidence.json"
+            EVIDENCE_ARG="--evidence urlscan-evidence.json"
+          elif python probe.py \
               --domains domain.txt \
               --limit "$LIMIT" \
               --seed "$SEED" \

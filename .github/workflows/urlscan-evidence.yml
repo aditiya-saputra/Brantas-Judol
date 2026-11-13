@@ -1,0 +1,145 @@
+name: urlscan-evidence
+
+# Hasil pencarian urlscan.io ditulis ke repo sebagai ledger bukti:
+# `urlscan-evidence.json`.
+#
+# File ini adalah sumber bukti untuk classify.yml. Karena ledger-nya sudah
+# ada di repo, job klasifikasi tidak perlu memanggil urlscan.io lagi -- tidak
+# ada kuota yang terpakai di dua job.
+#
+# Yang ditulis ke repo di sini HANYA hasil pencarian read-only dari
+# urlscan.io: daftar domain, jumlah scan, dan uuid halaman hasil. Tidak ada
+# keluaran LLM, tidak ada blocklist, tidak ada konten halaman indiazan --
+# hanya URL, judul, dan domain, sama seperti yang dipakai classify.py.
+#
+# Job ini memegang `contents: write` + `git push`. Karena itu:
+#   * hanya satu file yang di-commit, dan hanya kalau isinya berubah;
+#   * concurrency di-serialize (cancel-in-progress: false) supaya dua run
+#     tidak saling menimpa ledger;
+#   * pytest jalan dulu -- file yang ditulis job ini dipakai job lain, jadi
+#     skripnya harus lolos tes.
+
+on:
+  schedule:
+    # 04:17 UTC -- sengaja jauh dari ct-grab (23 */6 * * *), urlscan-probe
+    # (11 5 * * *), dan classify (41 7 * * *).
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Jumlah domain yang diperiksa'
+        required: false
+        default: '25'
+      size:
+        description: 'Scan per domain yang diminta'
+        required: false
+        default: '1'
+      sleep:
+        description: 'Jeda antar request (detik)'
+        required: false
+        default: '6'
+      seed:
+        description: 'Seed sampel (run dengan seed sama = himpunan sama)'
+        required: false
+        default: '0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: urlscan-evidence
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install deps
+        run: pip install -r requirements.txt pytest
+
+      - name: Test
+        run: python -m pytest -q
+
+      - name: Probe urlscan & merge ledger
+        env:
+          URLSCAN_API_KEY: ${{ secrets.URLSCAN_API_KEY }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_SIZE: ${{ inputs.size }}
+          INPUT_SLEEP: ${{ inputs.sleep }}
+          INPUT_SEED: ${{ inputs.seed }}
+        run: |
+          # workflow_dispatch mengisi inputs.*; schedule tidak (kosong).
+          # Default di sini harus sama dengan default workflow_dispatch.
+          LIMIT="${INPUT_LIMIT:-25}"
+          SIZE="${INPUT_SIZE:-1}"
+          SLEEP="${INPUT_SLEEP:-6}"
+          SEED="${INPUT_SEED:-0}"
+
+          echo "limit=$LIMIT size=$SIZE sleep=$SLEEP seed=$SEED"
+          echo "api key: $([ -n "$URLSCAN_API_KEY" ] && echo tersedia || echo tidak ada)"
+
+          # Input dari workflow_dispatch tetap harus numerik.
+          case "$LIMIT" in ''|*[!0-9]*) echo "::error::limit tidak valid: $LIMIT" >&2; exit 2;; esac
+          case "$SIZE"  in ''|*[!0-9]*) echo "::error::size tidak valid: $SIZE" >&2; exit 2;; esac
+          case "$SLEEP" in ''|*[!0-9]*) echo "::error::sleep tidak valid: $SLEEP" >&2; exit 2;; esac
+
+          if [ -n "$URLSCAN_API_KEY" ]; then
+            export PROBE_API_KEY="$URLSCAN_API_KEY"
+          fi
+
+          # --merge-out menggabungkan hasil run ini ke ledger yang sudah ada,
+          # bukan menimpanya: bukti yang pernah ditemukan tetap tersimpan.
+          python probe.py \
+            --domains domain.txt \
+            --limit "$LIMIT" \
+            --size "$SIZE" \
+            --sleep "$SLEEP" \
+            --seed "$SEED" \
+            --json-out probe-result.json \
+            --merge-out urlscan-evidence.json
+
+      - name: Commit ledger
+        if: always()
+        run: |
+          git config user.email "aditiya.saputrax1x2@gmail.com"
+          git config user.name "aditiya-saputra"
+
+          # Pastikan kita benar-benar di branch main (checkout sometimes
+          # meninggalkan detached HEAD untuk event terjadwal).
+          git checkout -B main
+
+          # Repo ini juga ditulis workflow lain (ct-grab). Tarik dulu supaya
+          # push tidak ditolak karena branch sudah maju -- file yang kita
+          # sentuh (urlscan-evidence.json) tidak beririsan dengan milik mereka
+          # (domain.txt, ct.db, stats.json).
+          git pull --rebase origin main
+
+          # File mungkin belum ada kalau probe gagal sebelum menulis apa pun.
+          git add urlscan-evidence.json 2>/dev/null || true
+
+          # Tidak ada bukti baru -> tidak ada commit.
+          git diff --cached --quiet || git commit -m "evidence: urlscan $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          git push origin main
+
+      - name: Upload hasil
+        # always(): kalau probe kena kuota, hasil parsial tetap berguna
+        # untuk diperiksa.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: urlscan-evidence-${{ github.run_id }}
+          path: |
+            urlscan-evidence.json
+            probe-result.json
+          if-no-files-found: warn
+          retention-days: 14
