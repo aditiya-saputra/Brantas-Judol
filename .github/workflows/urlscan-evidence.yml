@@ -117,17 +117,21 @@ jobs:
           # meninggalkan detached HEAD untuk event terjadwal).
           git checkout -B main
 
-          # Repo ini juga ditulis workflow lain (ct-grab). Tarik dulu supaya
-          # push tidak ditolak karena branch sudah maju -- file yang kita
-          # sentuh (urlscan-evidence.json) tidak beririsan dengan milik mereka
-          # (domain.txt, ct.db, stats.json).
-          git pull --rebase origin main
-
           # File mungkin belum ada kalau probe gagal sebelum menulis apa pun.
           git add urlscan-evidence.json 2>/dev/null || true
 
           # Tidak ada bukti baru -> tidak ada commit.
           git diff --cached --quiet || git commit -m "evidence: urlscan $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          # Repo ini juga ditulis workflow lain (ct-grab). Tarik dulu supaya
+          # push tidak ditolak karena branch sudah maju -- file yang kita
+          # sentuh (urlscan-evidence.json) tidak beririsan dengan milik mereka
+          # (domain.txt, ct.db, stats.json).
+          #
+          # WAJIB setelah commit: `git pull --rebase` menolak jalan kalau
+          # working tree masih punya perubahan yang belum di-commit ("You have
+          # unstaged changes"). Commit dulu, baru rebase.
+          git pull --rebase origin main
 
           git push origin main
 
