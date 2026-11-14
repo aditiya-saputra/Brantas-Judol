@@ -1,7 +1,27 @@
 {
   "schema": 1,
-  "generated_at": 1794581749,
+  "generated_at": 1794655987,
   "domains": [
+    {
+      "domain": "altogeldr.workers.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "betzillocasino.ink",
+      "total": 1,
+      "uuids": [
+        "01a18aaa-1c42-708c-9edf-70a86122806b"
+      ],
+      "first_uuid": "01a18aaa-1c42-708c-9edf-70a86122806b",
+      "first_url": "https://betzillocasino.ink/",
+      "first_scanned": "2026-10-30T02:36:42.972Z",
+      "checked_at": 1794655987
+    },
     {
       "domain": "casino9173.buzz",
       "total": 1,
@@ -12,6 +32,33 @@
       "first_url": "https://casino9173.buzz/",
       "first_scanned": "2026-06-26T05:55:56.842Z",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "casinoderoyal.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "casinoeldorado.biz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "casinonearme.ai",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
     },
     {
       "domain": "console.yard-free-casino.ru",
@@ -35,6 +82,17 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "dewaslot389elite.top",
+      "total": 1,
+      "uuids": [
+        "019f46dc-6f29-7226-b935-697a95b55f28"
+      ],
+      "first_uuid": "019f46dc-6f29-7226-b935-697a95b55f28",
+      "first_url": "https://dewaslot389elite.top/",
+      "first_scanned": "2026-07-09T12:31:27.958Z",
+      "checked_at": 1794655987
+    },
+    {
       "domain": "ebjudim-bnb37549.us-west-2.aws.privatelink.snowflake.com",
       "total": 0,
       "uuids": [],
@@ -53,6 +111,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "features.rocketplaycasino.club",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
       "domain": "ffq-ui-rtp-pet.herokuapp.com",
       "total": 0,
       "uuids": [],
@@ -60,6 +127,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "frankcasino-ro1-com.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
     },
     {
       "domain": "gesloten.pensioenbijconnectionsystems.nl",
@@ -71,6 +147,35 @@
       "checked_at": 1794581749
     },
     {
+      "domain": "gold777.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "ibet-casino.org",
+      "total": 1,
+      "uuids": [
+        "019dbf09-0c65-71de-a679-66f434613b24"
+      ],
+      "first_uuid": "019dbf09-0c65-71de-a679-66f434613b24",
+      "first_url": "https://ibet-casino.org/",
+      "first_scanned": "2026-04-24T10:29:01.593Z",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "lemon-casino-2-ink-f797ab75.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
       "domain": "luckyboomcasino.net",
       "total": 0,
       "uuids": [],
@@ -78,6 +183,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581749
+    },
+    {
+      "domain": "mail.pokerdom-casinos-buzz.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
     },
     {
       "domain": "mail.riobetcasino-352.top",
@@ -89,6 +203,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "messages.joycasino-lll.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
       "domain": "miraxcasino.casino.cori.infofozzzzzz.com",
       "total": 0,
       "uuids": [],
@@ -96,6 +219,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "myaccount.casinorox-igrat.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
     },
     {
       "domain": "only1.togelkds.com",
@@ -116,6 +248,55 @@
       "checked_at": 1794581749
     },
     {
+      "domain": "platin-casino.dk",
+      "total": 1,
+      "uuids": [
+        "01a1977e-f95d-759f-9381-d023282d7ae2"
+      ],
+      "first_uuid": "01a1977e-f95d-759f-9381-d023282d7ae2",
+      "first_url": "https://platin-casino.dk/",
+      "first_scanned": "2026-11-01T14:24:45.213Z",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "portal.melbet-casino-empire1.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "rapidslotexpress.nl",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "report.pokerdomslotbtc.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "rtptiannew.com",
+      "total": 1,
+      "uuids": [
+        "019cff49-e8f9-737d-99a5-bae956035611"
+      ],
+      "first_uuid": "019cff49-e8f9-737d-99a5-bae956035611",
+      "first_url": "https://rtptiannew1.com/",
+      "first_scanned": "2026-03-18T04:52:56.533Z",
+      "checked_at": 1794655987
+    },
+    {
       "domain": "slotsavvyspectacle.info",
       "total": 0,
       "uuids": [],
@@ -125,6 +306,24 @@
       "checked_at": 1794581749
     },
     {
+      "domain": "slotsfunnels.info",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "staff.1go-casino-up2.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
       "domain": "stakescasinoonline.de",
       "total": 0,
       "uuids": [],
@@ -132,6 +331,42 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "sushicasino-bonus.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "www.casinonightrentals.co.ke",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "www.superslot5043.ph",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
+    },
+    {
+      "domain": "www.top-10-online-casino-belgie.online-onraet.be",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1794655987
     }
   ]
 }
