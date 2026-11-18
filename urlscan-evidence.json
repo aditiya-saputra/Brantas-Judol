@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1794922369,
+  "generated_at": 1795007392,
   "domains": [
+    {
+      "domain": "alexistogel876.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
     {
       "domain": "alirsyadpwt-gacor.pages.dev",
       "total": 0,
@@ -37,6 +46,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "betrolla-casino-net.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "betting-gql.voxcasino320.com",
@@ -75,6 +93,24 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino3012.buzz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
+      "domain": "casino3706.cfd",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "casino6297.buzz",
@@ -190,6 +226,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "de.riobetcasino-tle.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "deploy.1wincasino4.ru",
       "total": 0,
       "uuids": [],
@@ -246,6 +291,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "elisabetcasino.nl",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "epicstar-casino.fun",
       "total": 0,
       "uuids": [],
@@ -262,6 +316,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794833499
+    },
+    {
+      "domain": "ev999casinobet.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "exchange.1xslots-477.top",
@@ -327,6 +390,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "gacorimba.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "game4dslot-neww.pages.dev",
       "total": 0,
       "uuids": [],
@@ -372,6 +444,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "grandscasino.uk",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "guruslot.skin",
       "total": 0,
       "uuids": [],
@@ -408,6 +489,15 @@
       "first_url": "https://ibet-casino.org/",
       "first_scanned": "2026-04-24T10:29:01.593Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "judithwongcounseling.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "kaptogel.org",
@@ -448,6 +538,17 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "linkslot235.info",
+      "total": 1,
+      "uuids": [
+        "01a125c0-92ca-762c-bb87-af14855c620b"
+      ],
+      "first_uuid": "01a125c0-92ca-762c-bb87-af14855c620b",
+      "first_url": "https://linkslot235.info/",
+      "first_scanned": "2026-10-10T12:19:08.043Z",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "login.jaldijackpot.com",
       "total": 0,
       "uuids": [],
@@ -484,6 +585,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "mail.1wincasino10.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "mail.pokerdom-casinos-buzz.ru",
       "total": 0,
       "uuids": [],
@@ -518,6 +628,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794833499
+    },
+    {
+      "domain": "maxwin555win.online",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "maxwinm.com",
@@ -587,6 +706,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "onlinecasino.bet",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "only1.togelkds.com",
       "total": 0,
       "uuids": [],
@@ -612,6 +740,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "painel.5335.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "panel.fugu-casino69.casino",
@@ -650,6 +787,15 @@
       "checked_at": 1794833499
     },
     {
+      "domain": "pistolocasino-no.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "platin-casino.dk",
       "total": 1,
       "uuids": [
@@ -668,6 +814,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794744140
+    },
+    {
+      "domain": "pokerstarscasino.bet.qa-dev-pr16150-fe.starsweb.io",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "pokerstarscasino.net.preview3.starsweb.io",
@@ -722,6 +877,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794744140
+    },
+    {
+      "domain": "rabbitmq.pokerdom-casino-4bc.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "rabonacasino-it-org-78620-6bc.pages.dev",
@@ -789,6 +953,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "signin.casino6654.online",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "slot-5000.cap.attractmode.org",
       "total": 0,
       "uuids": [],
@@ -823,6 +996,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581749
+    },
+    {
+      "domain": "slotseeker.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "slotsfunnels.info",
@@ -897,6 +1079,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "vpn.kibana.2759.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "webdisk.rtpmacau88.com",
       "total": 0,
       "uuids": [],
@@ -931,6 +1122,24 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "www.eurojackpotresults.info",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
+      "domain": "www.gacorcheat.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "www.judithbrownmeyersphotography.com",
@@ -969,6 +1178,15 @@
       "checked_at": 1794833499
     },
     {
+      "domain": "www.r7casino366.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
+    },
+    {
       "domain": "www.rtpslot88jp6.online.gvp.ltb.mybluehost.me",
       "total": 0,
       "uuids": [],
@@ -994,6 +1212,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "www.superslot0844.ph",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795007392
     },
     {
       "domain": "www.superslot4506.ph",
