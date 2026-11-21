@@ -595,3 +595,16 @@ def test_fetch_fallback_markdown_tries_jina_then_direct_then_firecrawl(monkeypat
     assert "bad()" not in result
     assert len(calls) == 2
 
+
+def test_merge_classify_ledger_merges_and_updates_by_domain(tmp_path):
+    ledger = tmp_path / "classify-result.json"
+    ledger.write_text(json.dumps([{"domain": "a.com", "score": 10}, {"domain": "b.com", "score": 20}]), encoding="utf-8")
+    new_rows = [{"domain": "b.com", "score": 90}, {"domain": "c.com", "score": 85}]
+    merged = classify.merge_classify_ledger(str(ledger), new_rows)
+    lookup = {item["domain"]: item["score"] for item in merged}
+    assert lookup["a.com"] == 10
+    assert lookup["b.com"] == 90
+    assert lookup["c.com"] == 85
+    assert len(merged) == 3
+
+

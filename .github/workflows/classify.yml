@@ -20,9 +20,9 @@ on:
   workflow_dispatch:
     inputs:
       limit:
-        description: 'Jumlah domain per run'
+        description: 'Jumlah domain per run (10-50)'
         required: false
-        default: '10'
+        default: '25'
       block_threshold:
         description: 'Skor minimum masuk blocklist'
         required: false
@@ -37,7 +37,7 @@ on:
         default: '0'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: classify
@@ -85,7 +85,7 @@ jobs:
         run: |
           # schedule tidak mengisi inputs.* -- default harus sama dengan
           # default workflow_dispatch di atas.
-          LIMIT="${INPUT_LIMIT:-10}"
+          LIMIT="${INPUT_LIMIT:-25}"
           BLOCK="${INPUT_BLOCK:-80}"
           ALLOW="${INPUT_ALLOW:-20}"
           # Run terjadwal memakai seed hari-ini (day-of-year) supaya tiap hari
@@ -144,7 +144,19 @@ jobs:
             $EVIDENCE_ARG \
             --scrape-fallback \
             --out-dir hasil \
-            --json-out hasil/classify-result.json
+            --json-out hasil/classify-result.json \
+            --merge-out classify-result.json
+
+      - name: Commit ledger klasifikasi
+        if: always()
+        run: |
+          git config user.email "aditiya.saputrax1x2@gmail.com"
+          git config user.name "aditiya-saputra"
+          git checkout -B main
+          git add classify-result.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "classify: update ledger $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git pull --rebase origin main
+          git push origin main
 
       - name: Upload hasil
         if: always()

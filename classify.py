@@ -283,6 +283,25 @@ def fetch_fallback_markdown(domain: str, timeout: float = 6.0) -> str:
     return ""
 
 
+def merge_classify_ledger(existing_path: str, new_rows: list[dict]) -> list[dict]:
+    # ponytail: list merge keyed by domain; upgrade to sqlite if ledger > 10k items
+    by_domain: dict[str, dict] = {}
+    if os.path.exists(existing_path):
+        try:
+            with open(existing_path, encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    for item in data:
+                        if isinstance(item, dict) and item.get("domain"):
+                            by_domain[item["domain"]] = item
+        except Exception:
+            pass
+    for row in new_rows:
+        if isinstance(row, dict) and row.get("domain"):
+            by_domain[row["domain"]] = row
+    return list(by_domain.values())
+
+
 def load_evidence(path: str, links: int = DEFAULT_LINKS) -> dict[str, list[str]]:
     """Baca file bukti -> {domain: [url halaman hasil urlscan]}.
 
@@ -488,6 +507,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="ambil cuplikan isi domain via reader/scraper fallback bila bukti urlscan kosong",
     )
     parser.add_argument("--json-out", help="simpan hasil lengkap sebagai JSON")
+    parser.add_argument(
+        "--merge-out",
+        help="gabungkan hasil klasifikasi ke ledger JSON yang ada",
+    )
     return parser
 
 
@@ -610,6 +633,13 @@ def main(argv: Optional[list[str]] = None) -> int:
             json.dumps(rows, indent=2, ensure_ascii=False), encoding="utf-8"
         )
         print(f"\nhasil JSON: {args.json_out}")
+
+    if args.merge_out:
+        merged = merge_classify_ledger(args.merge_out, rows)
+        Path(args.merge_out).write_text(
+            json.dumps(merged, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        print(f"ledger klasifikasi: {args.merge_out} ({len(merged)} domain)")
 
     return 0 if rows else 1
 
