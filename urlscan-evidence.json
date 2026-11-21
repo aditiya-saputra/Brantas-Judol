@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1795179577,
+  "generated_at": 1795248875,
   "domains": [
+    {
+      "domain": "aladdinslotsclub.co.uk",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795248875
+    },
     {
       "domain": "albaslotvip.pages.dev",
       "total": 0,
@@ -713,6 +722,27 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "lab.jogoapostascasino.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795248875,
+      "scan_uuid": "01a1fd2b-5e4d-738a-ae7f-31e6d1340792",
+      "scan_status": "done",
+      "scan_title": "Welcome!",
+      "scan_page_url": "https://lab.jogoapostascasino.com/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a1fd2b-5e4d-738a-ae7f-31e6d1340792.png",
+      "scan_contacted": [
+        "lab.jogoapostascasino.com"
+      ],
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795248856
+    },
+    {
       "domain": "leafy-sloth-5809.chatgpt.site",
       "total": 0,
       "uuids": [],
@@ -832,6 +862,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "mail.rtp.sfu.mybluehost.me",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795248875
     },
     {
       "domain": "mail.twin999slot.com",
@@ -1472,6 +1511,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "www.918kissslotlogin.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795248875
+    },
+    {
       "domain": "www.batmantogelsgp.com",
       "total": 0,
       "uuids": [],
@@ -1726,6 +1774,27 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795094157
+    },
+    {
+      "domain": "yohoslot-luchshie-sloty-brazilian-blackjackx-4-c1bfd.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795248875,
+      "scan_uuid": "01a1fd2a-ca01-7326-9edc-ca4d2ed71843",
+      "scan_status": "done",
+      "scan_title": "Loading…",
+      "scan_page_url": "https://yohoslot-luchshie-sloty-brazilian-blackjackx-4-c1bfd.pages.dev/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a1fd2a-ca01-7326-9edc-ca4d2ed71843.png",
+      "scan_contacted": [
+        "yohoslot-luchshie-sloty-brazilian-blackjackx-4-c1bfd.pages.dev"
+      ],
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795248818
     },
     {
       "domain": "zonder-cruks-online-casino.com",
