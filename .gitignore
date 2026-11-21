@@ -12,9 +12,6 @@ hasil.txt
 infra.json
 tls.json
 
-# keluaran klasifikasi LLM -> belum diverifikasi manusia, jangan dipublikasikan
-blocklist.txt
-whitelist.txt
-review.txt
+# keluaran probe sementara
 probe-result.json
 probe.json

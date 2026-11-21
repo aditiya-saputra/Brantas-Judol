@@ -210,8 +210,13 @@ def _extract_text(payload: dict) -> str:
     raise ClassifyError("respons tidak punya blok teks")
 
 
-def fetch_fallback_markdown(domain: str, timeout: float = 6.0) -> str:
+def fetch_fallback_markdown(
+    domain: str,
+    timeout: httpx.Timeout | float | None = None,
+) -> str:
     # ponytail: Jina -> Direct GET -> Firecrawl -> Hyperbrowser fallback chain; upgrade when async queue needed
+    if timeout is None:
+        timeout = httpx.Timeout(3.0, connect=1.5)
     headers = {"User-Agent": USER_AGENT}
 
     # 1. Jina Reader (free, no auth, clean markdown)
@@ -524,6 +529,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--merge-out",
         help="gabungkan hasil klasifikasi ke ledger JSON yang ada",
     )
+    parser.add_argument(
+        "--merge-outputs",
+        action="store_true",
+        help="gabungkan hasil blocklist/whitelist/review dengan file yang sudah ada",
+    )
     return parser
 
 
@@ -626,7 +636,13 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    counts = write_outputs(rows, out_dir, args.block_threshold, args.allow_threshold)
+    counts = write_outputs(
+        rows,
+        out_dir,
+        args.block_threshold,
+        args.allow_threshold,
+        merge=args.merge_outputs,
+    )
 
     print()
     print(f"diklasifikasi  : {len(rows)}")
