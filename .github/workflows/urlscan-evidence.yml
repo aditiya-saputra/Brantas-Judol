@@ -21,9 +21,14 @@ name: urlscan-evidence
 
 on:
   schedule:
-    # 04:17 UTC -- sengaja jauh dari ct-grab (23 */6 * * *), urlscan-probe
-    # (11 5 * * *), dan classify (41 7 * * *).
-    - cron: '17 4 * * *'
+    # 4 kali per hari (tiap 6 jam): 00:17, 06:17, 12:17, 18:17 UTC.
+    # Sengaja di menit 17 agar tidak bertabrakan dengan ct-grab (23 */6 * * *)
+    # maupun classify (41 7 * * *).
+    #
+    # Dengan 4x/hari dan default max_submit=3, total scan yang diminta adalah
+    # maks 12 scan/hari -- masih jauh di bawah batas kuota gratis urlscan.io
+    # (~50-100 scan publik/hari).
+    - cron: '17 0,6,12,18 * * *'
   workflow_dispatch:
     inputs:
       limit:

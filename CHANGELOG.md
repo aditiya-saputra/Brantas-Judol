@@ -29,6 +29,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`probe.py` scan robustness improvements:**
+  - HTTP 409 Conflict handled: extracts existing scan UUID instead of aborting.
+  - HTTP 200 without UUID raises `ProbeError` immediately without retrying.
+  - `poll_result` retries on garbled JSON instead of dropping completed scan data.
+  - `poll_result` returns immediately when `timeout <= 0`.
+  - Type guards in `summarize_scan` protect against malformed non-string fields.
+  - `submit_sleep` enforced after every submit attempt (success or failure).
+  - In-loop duplicate tracking prevents duplicate domains in sample from re-scanning.
+  - Error messages on non-retryable search failures include response body.
+  - 7 new tests (178 total, all passing).
+- **`urlscan-evidence.yml` schedule updated to 4x daily** (`17 0,6,12,18 * * *`,
+  every 6 hours) at 00:17, 06:17, 12:17, 18:17 UTC.
 - **`probe.py` can now REQUEST a scan, not just search for one.** `--submit-scan`
   submits `POST /api/v1/scan` for domains that have no scan at all, polls
   `GET /api/v1/result/{uuid}/` until the result is ready, and records the

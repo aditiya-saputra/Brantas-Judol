@@ -432,12 +432,13 @@ flowchart LR
 
 ## 8. CI workflow (`urlscan-evidence`)
 
-`.github/workflows/urlscan-evidence.yml` — daily at 04:17 UTC, also manual.
-Commits `urlscan-evidence.json` to repo. `contents: write`.
+`.github/workflows/urlscan-evidence.yml` — 4x daily at 00:17, 06:17, 12:17,
+18:17 UTC (every 6 hours), also manual. Commits `urlscan-evidence.json` to repo.
+`contents: write`.
 
 ```mermaid
 flowchart TD
-    Trigger["schedule: 17 4 * * *<br/>or workflow_dispatch"] --> Co{"another run<br/>in progress?"}
+    Trigger["schedule: 17 0,6,12,18 * * *<br/>(4x per hari)<br/>or workflow_dispatch"] --> Co{"another run<br/>in progress?"}
     Co -- yes --> Queue["queue — do NOT cancel<br/>(ledger must not race)"]
     Queue --> Co
 

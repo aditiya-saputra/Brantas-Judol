@@ -655,6 +655,121 @@ def test_main_disables_request_scan_without_api_key(tmp_path, monkeypatch, capsy
     assert "dimatikan" in capsys.readouterr().err
 
 
+def test_submit_scan_handles_409_with_existing_uuid(monkeypatch):
+    """409 Conflict berarti domain sedang dipindai; ambil uuid dari respons."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(409, json={"uuid": "conflict-uuid-99"})
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        uuid = probe.submit_scan(client, "judol.example")
+
+    assert uuid == "conflict-uuid-99"
+
+
+def test_submit_scan_raises_on_409_without_uuid(monkeypatch):
+    """409 tanpa uuid harus raise ProbeError."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(409, json={"message": "conflict without uuid"})
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(probe.ProbeError, match="409"):
+            probe.submit_scan(client, "judol.example")
+
+
+def test_submit_scan_raises_on_200_without_uuid(monkeypatch):
+    """200 tanpa uuid tidak boleh di-retry berulang kali -- langsung raise."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"status": "accepted"})
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(probe.ProbeError, match="respons 200 tanpa uuid"):
+            probe.submit_scan(client, "judol.example")
+
+
+def test_poll_result_returns_none_when_timeout_zero():
+    """Timeout 0 langsung return None tanpa request network."""
+    with RealClient() as client:
+        assert probe.poll_result(client, "uuid-1", timeout=0) is None
+        assert probe.poll_result(client, "uuid-1", timeout=-5) is None
+
+
+def test_poll_result_retries_on_bad_json(monkeypatch):
+    """200 dengan JSON rusak dicoba lagi alih-alih langsung menyerah."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return httpx.Response(200, text="<!DOCTYPE html>Gateway Timeout")
+        return httpx.Response(200, json={"page": {"title": "OK"}})
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        payload = probe.poll_result(client, "uuid-1", timeout=10)
+
+    assert payload is not None
+    assert payload["page"]["title"] == "OK"
+    assert calls >= 2
+
+
+def test_summarize_scan_handles_non_string_types():
+    """Tipe non-string (dict, list, int) pada title/url/shot tidak merusak summary."""
+    payload = {
+        "page": {
+            "title": {"complex": "object"},
+            "url": ["unexpected", "list"],
+            "status": "200",  # string-number aman di-convert ke int
+        },
+        "task": {
+            "screenshotURL": None,
+        },
+        "lists": {"domains": ["a.com"]},
+    }
+    summary = probe.summarize_scan(payload)
+    assert "scan_title" not in summary
+    assert "scan_page_url" not in summary
+    assert "scan_screenshot" not in summary
+    assert summary["scan_http_status"] == 200
+    assert summary["scan_status"] == "done"
+
+
+def test_main_enforces_submit_sleep_even_after_failure(tmp_path, monkeypatch):
+    """Jeda submit_sleep tetap dijalankan meskipun submit_scan gagal."""
+    slept = []
+    monkeypatch.setattr(probe.time, "sleep", lambda s: slept.append(s))
+    monkeypatch.setenv("PROBE_API_KEY", "secret-123")
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\nb.com\n", encoding="utf-8")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            return httpx.Response(403, json={"message": "forbidden"})
+        return httpx.Response(200, json={"results": [], "total": 0})
+
+    fake_client = RealClient(transport=httpx.MockTransport(handler))
+    monkeypatch.setattr(probe.httpx, "Client", lambda **kw: fake_client)
+
+    probe.main([
+        "--domains", str(domains),
+        "--limit", "2",
+        "--sleep", "0",
+        "--submit-scan",
+        "--max-submit", "2",
+        "--submit-sleep", "12.0",
+        "--poll-seconds", "1",
+    ])
+
+    # 12.0 detik submit_sleep harus tercatat meski submit pertama gagal
+    assert 12.0 in slept
+
+
 # --------------------------------------------------------------------------
 # ringkasan
 # --------------------------------------------------------------------------

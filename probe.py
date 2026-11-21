@@ -118,10 +118,10 @@ def _fetch_results(
             last = f"HTTP {resp.status_code}"
             retry_after = resp.headers.get("retry-after", "").strip()
             if retry_after.isdigit():
-                delay = max(1.0, float(retry_after))
+                delay = max(delay, float(retry_after))
             continue
         if resp.status_code >= 400:
-            raise ProbeError(f"HTTP {resp.status_code} for {domain}")
+            raise ProbeError(f"HTTP {resp.status_code} for {domain}: {resp.text[:200]}")
 
         try:
             payload = resp.json()
@@ -249,8 +249,18 @@ def submit_scan(
             last = f"HTTP {resp.status_code}"
             retry_after = resp.headers.get("retry-after", "").strip()
             if retry_after.isdigit():
-                delay = max(1.0, float(retry_after))
+                delay = max(delay, float(retry_after))
             continue
+        if resp.status_code == 409:
+            # Domain sedang dipindai oleh orang lain / kita sendiri.
+            # Ambil uuid yang sudah ada dari respons kalau bisa.
+            try:
+                existing_uuid = str(resp.json().get("uuid") or "")
+            except (ValueError, AttributeError):
+                existing_uuid = ""
+            if existing_uuid:
+                return existing_uuid
+            raise ProbeError(f"HTTP 409 (sudah dipindai): {resp.text[:200]}")
         if resp.status_code >= 400:
             # 401/403 = API key tidak punya scope write. Fatal untuk mode
             # ini, tapi tidak untuk seluruh run.
@@ -265,7 +275,8 @@ def submit_scan(
         uuid = str(payload.get("uuid") or "")
         if uuid:
             return uuid
-        last = f"respons tanpa uuid: {str(payload)[:120]}"
+        # 200 tanpa uuid = skema respons berubah. Tidak perlu retry.
+        raise ProbeError(f"respons 200 tanpa uuid: {str(payload)[:120]}")
 
     raise RateLimited(f"gagal request scan untuk {domain}: {last}")
 
@@ -282,6 +293,8 @@ def poll_result(
     polling tiap 2 detik. Di sini intervalnya lebih longgar supaya tidak
     menyalahi kuota API.
     """
+    if timeout <= 0:
+        return None
     deadline = time.monotonic() + timeout
     # Dokumentasi urlscan menyarankan menunggu ~10 detik sebelum polling.
     # Tidur dibatasi seperempat timeout supaya sisa waktu masih cukup untuk
@@ -299,7 +312,10 @@ def poll_result(
             try:
                 payload = resp.json()
             except ValueError:
-                return None
+                # 200 tapi JSON rusak — transient CDN glitch, coba lagi.
+                print(f"  [poll] {uuid}: 200 tapi JSON rusak, coba lagi", file=sys.stderr)
+                time.sleep(interval)
+                continue
             return payload if isinstance(payload, dict) else None
         # 404 = scan masih berjalan. 429/5xx = coba lagi nanti.
         time.sleep(interval)
@@ -319,21 +335,30 @@ def summarize_scan(payload: dict) -> dict:
     page = payload.get("page") or {}
     task = payload.get("task") or {}
 
-    title = str(page.get("title") or "").strip()
-    if title:
-        out["scan_title"] = title[:300]
-    page_url = str(page.get("url") or "")
-    if page_url:
-        out["scan_page_url"] = page_url[:500]
+    title = page.get("title")
+    if isinstance(title, str):
+        title = title.strip()[:300]
+        if title:
+            out["scan_title"] = title
+
+    page_url = page.get("url")
+    if isinstance(page_url, str):
+        page_url = page_url.strip()[:500]
+        if page_url:
+            out["scan_page_url"] = page_url
+
     status = page.get("status")
     if status is not None:
         try:
             out["scan_http_status"] = int(status)
         except (TypeError, ValueError):
             pass
-    shot = str(task.get("screenshotURL") or "")
-    if shot:
-        out["scan_screenshot"] = shot[:300]
+
+    shot = task.get("screenshotURL")
+    if isinstance(shot, str):
+        shot = shot.strip()[:300]
+        if shot:
+            out["scan_screenshot"] = shot
 
     contacted = payload.get("lists") or {}
     domains = contacted.get("domains") or []
@@ -631,6 +656,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     args = build_arg_parser().parse_args(argv)
     args.limit = max(1, args.limit)
     args.size = max(1, args.size)
+    args.poll_seconds = max(0.0, args.poll_seconds)
+    args.max_submit = max(0, args.max_submit)
+    args.submit_sleep = max(0.0, args.submit_sleep)
 
     try:
         domains = load_candidates(args.domains)
@@ -744,12 +772,25 @@ def main(argv: Optional[list[str]] = None) -> int:
                     if uuid:
                         row["scan_pending_uuid"] = uuid
                         row["scan_status"] = "requested"
+                        # Update existing in-place supaya duplikat di sample
+                        # tidak meminta scan dua kali dalam satu run.
+                        existing.setdefault(domain, {})["scan_pending_uuid"] = uuid
                         print(f"  [{index}/{len(sample)}] {domain}: scan diminta ({uuid})")
-                        payload = poll_result(client, uuid, args.poll_seconds)
+                        payload = None
+                        try:
+                            payload = poll_result(client, uuid, args.poll_seconds)
+                        except Exception as exc:
+                            print(
+                                f"  [{index}/{len(sample)}] {domain}: "
+                                f"poll gagal: {exc}",
+                                file=sys.stderr,
+                            )
                         if payload:
                             row.update(summarize_scan(payload))
                             row["scan_uuid"] = uuid
                             row.pop("scan_pending_uuid", None)
+                            existing[domain]["scan_uuid"] = uuid
+                            existing[domain].pop("scan_pending_uuid", None)
                             detail = row.get("scan_title") or row.get("scan_page_url") or "(tanpa judul)"
                             print(f"  [{index}/{len(sample)}] {domain}: scan selesai -> {detail}")
                         else:
@@ -760,8 +801,12 @@ def main(argv: Optional[list[str]] = None) -> int:
                                 f"  [{index}/{len(sample)}] {domain}: "
                                 "scan belum selesai, dicatat sebagai pending"
                             )
-                        if args.submit_sleep > 0 and submit_budget > 0:
-                            time.sleep(args.submit_sleep)
+
+                    # Jeda selalu dijalankan setelah setiap percobaan submit
+                    # (baik berhasil maupun gagal), supaya backoff rate-limit
+                    # tidak terlewat ketika API mulai melempar error.
+                    if args.submit_sleep > 0 and submit_budget > 0:
+                        time.sleep(args.submit_sleep)
 
             rows.append(row)
             status = f"{row['total']} scan" if row["total"] else "tidak ada scan"
