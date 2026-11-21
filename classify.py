@@ -448,16 +448,29 @@ def write_outputs(
     out_dir: Path,
     block_threshold: int,
     allow_threshold: int,
+    merge: bool = False,
 ) -> dict[str, int]:
-    buckets: dict[str, list[str]] = {name: [] for name in OUTPUT_FILES}
+    buckets: dict[str, set[str]] = {name: set() for name in OUTPUT_FILES}
+    if merge:
+        for name, filename in OUTPUT_FILES.items():
+            path = out_dir / filename
+            if path.exists():
+                buckets[name].update(
+                    line.strip().lower()
+                    for line in path.read_text(encoding="utf-8").splitlines()
+                    if line.strip()
+                )
+
     for row in rows:
-        buckets[decide(row["score"], block_threshold, allow_threshold)].append(
-            row["domain"]
-        )
+        target = decide(row["score"], block_threshold, allow_threshold)
+        domain = row["domain"].strip().lower()
+        for name in buckets:
+            buckets[name].discard(domain)
+        buckets[target].add(domain)
 
     counts = {}
     for name, filename in OUTPUT_FILES.items():
-        items = sorted(set(buckets[name]))
+        items = sorted(buckets[name])
         path = out_dir / filename
         path.write_text("".join(d + "\n" for d in items), encoding="utf-8")
         counts[name] = len(items)
