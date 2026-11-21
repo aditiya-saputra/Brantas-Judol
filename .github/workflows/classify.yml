@@ -76,6 +76,8 @@ jobs:
       - name: Run classifier
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          HYPERBROWSER_API_KEY: ${{ secrets.HYPERBROWSER_API_KEY }}
           INPUT_LIMIT: ${{ inputs.limit }}
           INPUT_BLOCK: ${{ inputs.block_threshold }}
           INPUT_ALLOW: ${{ inputs.allow_threshold }}
@@ -140,6 +142,7 @@ jobs:
             --allow-threshold "$ALLOW" \
             --seed "$SEED" \
             $EVIDENCE_ARG \
+            --scrape-fallback \
             --out-dir hasil \
             --json-out hasil/classify-result.json
 

@@ -575,3 +575,23 @@ def test_main_rejects_missing_evidence_file(tmp_path, monkeypatch, capsys):
 
     assert code == 1
     assert "gagal membaca bukti" in capsys.readouterr().err
+
+
+def test_fetch_fallback_markdown_tries_jina_then_direct_then_firecrawl(monkeypatch):
+    calls = []
+
+    def mock_get(url, **kwargs):
+        calls.append(url)
+        if "r.jina.ai" in url:
+            # Jina returns block
+            return httpx.Response(403, text='{"name":"AbuseAlleviationError"}')
+        # Direct GET returns HTML (> 100 chars)
+        body = "<html><body><script>bad()</script><h1>Situs Judol Resmi Terpercaya</h1><p>" + ("Slot gacor hari ini " * 10) + "</p></body></html>"
+        return httpx.Response(200, text=body)
+
+    monkeypatch.setattr(classify.httpx, "get", mock_get)
+    result = classify.fetch_fallback_markdown("target.com")
+    assert "Situs Judol" in result
+    assert "bad()" not in result
+    assert len(calls) == 2
+

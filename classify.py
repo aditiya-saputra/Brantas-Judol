@@ -44,8 +44,10 @@ Endpoint (terverifikasi 2026-11-10 terhadap dokumentasi resmi):
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -206,6 +208,79 @@ def _extract_text(payload: dict) -> str:
                 if isinstance(text, str) and text.strip():
                     return text
     raise ClassifyError("respons tidak punya blok teks")
+
+
+def fetch_fallback_markdown(domain: str, timeout: float = 6.0) -> str:
+    # ponytail: Jina -> Direct GET -> Firecrawl -> Hyperbrowser fallback chain; upgrade when async queue needed
+    headers = {"User-Agent": USER_AGENT}
+
+    # 1. Jina Reader (free, no auth, clean markdown)
+    try:
+        resp = httpx.get(f"https://r.jina.ai/https://{domain}", timeout=timeout, headers=headers)
+        if resp.status_code == 200 and "AbuseAlleviationError" not in resp.text:
+            text = resp.text.strip()
+            if len(text) > 100:
+                return text[:1500]
+    except Exception:
+        pass
+
+    # 2. Direct HTTP GET (0 quota, bypasses Jina block)
+    try:
+        resp = httpx.get(f"https://{domain}", timeout=timeout, follow_redirects=True, headers=headers)
+        if resp.status_code == 200:
+            cleaned = re.sub(r"(?is)<(script|style|noscript|svg)[^>]*>.*?</\1>", " ", resp.text)
+            cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+            text = " ".join(html.unescape(cleaned).split())
+            if len(text) > 100:
+                return text[:1500]
+    except Exception:
+        pass
+
+    # 3. Firecrawl (if FIRECRAWL_API_KEY present)
+    fc_key = os.environ.get("FIRECRAWL_API_KEY", "").strip()
+    if fc_key:
+        try:
+            resp = httpx.post(
+                "https://api.firecrawl.dev/v1/scrape",
+                json={"url": f"https://{domain}", "formats": ["markdown"]},
+                headers={"Authorization": f"Bearer {fc_key}"},
+                timeout=timeout * 1.5,
+            )
+            if resp.status_code == 200:
+                md = resp.json().get("data", {}).get("markdown", "").strip()
+                if len(md) > 100:
+                    return md[:1500]
+        except Exception:
+            pass
+
+    # 4. Hyperbrowser (if HYPERBROWSER_API_KEY present)
+    hb_key = os.environ.get("HYPERBROWSER_API_KEY", "").strip()
+    if hb_key:
+        try:
+            hb_resp = httpx.post(
+                "https://api.hyperbrowser.ai/api/scrape",
+                json={"url": f"https://{domain}", "scrapeOptions": {"formats": ["markdown"]}},
+                headers={"x-api-key": hb_key, "Content-Type": "application/json"},
+                timeout=timeout,
+            )
+            if hb_resp.status_code == 200:
+                job_id = hb_resp.json().get("jobId")
+                if job_id:
+                    for _ in range(3):
+                        time.sleep(1.5)
+                        poll = httpx.get(
+                            f"https://api.hyperbrowser.ai/api/scrape/{job_id}",
+                            headers={"x-api-key": hb_key},
+                            timeout=timeout,
+                        )
+                        if poll.status_code == 200 and poll.json().get("status") == "completed":
+                            md = poll.json().get("data", {}).get("markdown", "").strip()
+                            if len(md) > 100:
+                                return md[:1500]
+        except Exception:
+            pass
+
+    return ""
 
 
 def load_evidence(path: str, links: int = DEFAULT_LINKS) -> dict[str, list[str]]:
@@ -407,6 +482,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="gunakan Google Search grounding tool di Gemini (butuh kuota grounding)",
     )
+    parser.add_argument(
+        "--scrape-fallback",
+        action="store_true",
+        help="ambil cuplikan isi domain via reader/scraper fallback bila bukti urlscan kosong",
+    )
     parser.add_argument("--json-out", help="simpan hasil lengkap sebagai JSON")
     return parser
 
@@ -475,6 +555,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     try:
         for index, domain in enumerate(sample, 1):
             links = evidence.get(domain, [])
+            if args.scrape_fallback and not getattr(links, "dom_snippet", ""):
+                snippet = fetch_fallback_markdown(domain)
+                if snippet:
+                    if isinstance(links, Evidence):
+                        links.dom_snippet = snippet
+                    else:
+                        links = Evidence(links=list(links), dom_snippet=snippet)
 
             try:
                 row = classify(gemini, domain, links, args.model, grounding=args.google_search)
