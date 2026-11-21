@@ -368,6 +368,294 @@ def test_main_merging_keeps_previous_evidence(tmp_path, monkeypatch):
 
 
 # --------------------------------------------------------------------------
+# request scan (POST /api/v1/scan)
+# --------------------------------------------------------------------------
+
+class FakeScan:
+    """urlscan.io tiruan untuk endpoint submit scan.
+
+    fail_after : request ke-(fail_after) dst gagal dengan status
+    """
+
+    def __init__(self, uuid="scan-uuid-1", fail_after=None, status=429):
+        self.uuid = uuid
+        self.fail_after = fail_after
+        self.status = status
+        self.posts: list[dict] = []
+        self.headers: list[str] = []
+
+    def handler(self, request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            self.posts.append(json.loads(request.content))
+            self.headers.append(request.headers.get("API-Key") or "")
+            if self.fail_after is not None and len(self.posts) >= self.fail_after:
+                return httpx.Response(self.status, json={"message": "quota"})
+            return httpx.Response(
+                200,
+                json={
+                    "uuid": self.uuid,
+                    "country": "ID",
+                    "visibility": "public",
+                    "url": request.content and json.loads(request.content)["url"],
+                },
+            )
+        if request.url.path.startswith("/api/v1/result/"):
+            return httpx.Response(
+                200,
+                json={
+                    "task": {"uuid": self.uuid, "screenshotURL": f"https://urlscan.io/screenshots/{self.uuid}.png"},
+                    "page": {"url": "https://judol.example/", "title": "Situs Judi Online", "status": 200},
+                    "lists": {"domains": ["judol.example", "cdn.example", "ads.example"]},
+                    "verdicts": {"overall": {"malicious": False, "score": -12}},
+                },
+            )
+        return httpx.Response(200, json={"results": [], "total": 0})
+
+    def client(self) -> httpx.Client:
+        return RealClient(transport=httpx.MockTransport(self.handler))
+
+
+def test_submit_scan_returns_uuid(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan()
+    with RealClient(transport=httpx.MockTransport(fake.handler)) as client:
+        uuid = probe.submit_scan(client, "judol.example")
+
+    assert uuid == "scan-uuid-1"
+    assert fake.posts[0]["url"] == "https://judol.example"
+    assert fake.posts[0]["visibility"] == "public"
+
+
+def test_submit_scan_sends_api_key(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan()
+    with RealClient(
+        transport=httpx.MockTransport(fake.handler),
+        headers={"API-Key": "secret-123"},
+    ) as client:
+        probe.submit_scan(client, "judol.example")
+
+    assert fake.headers == ["secret-123"]
+
+
+def test_submit_scan_honours_url_template(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan()
+    with RealClient(transport=httpx.MockTransport(fake.handler)) as client:
+        probe.submit_scan(client, "judol.example", url_template="https://{domain}/main")
+
+    assert fake.posts[0]["url"] == "https://judol.example/main"
+
+
+def test_submit_scan_raises_on_forbidden(monkeypatch):
+    """API key tanpa scope write harus jadi error yang jelas, bukan diam-diam."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(403, json={"message": "no write scope"})
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(probe.ProbeError, match="403"):
+            probe.submit_scan(client, "judol.example")
+
+
+def test_submit_scan_retries_then_gives_up(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan(fail_after=1, status=429)
+    with RealClient(transport=httpx.MockTransport(fake.handler)) as client:
+        with pytest.raises(probe.RateLimited):
+            probe.submit_scan(client, "judol.example", retries=3)
+
+    assert len(fake.posts) == 3
+
+
+def test_poll_result_returns_payload(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan()
+    with RealClient(transport=httpx.MockTransport(fake.handler)) as client:
+        payload = probe.poll_result(client, "scan-uuid-1", timeout=5)
+
+    assert payload is not None
+    assert payload["page"]["title"] == "Situs Judi Online"
+
+
+def test_poll_result_returns_none_on_timeout(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(404, json={"message": "still running"})
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        assert probe.poll_result(client, "scan-uuid-1", timeout=0.05) is None
+
+
+def test_summarize_scan_extracts_metadata(monkeypatch):
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan()
+    with RealClient(transport=httpx.MockTransport(fake.handler)) as client:
+        payload = probe.poll_result(client, "scan-uuid-1", timeout=5)
+
+    summary = probe.summarize_scan(payload)
+
+    assert summary["scan_title"] == "Situs Judi Online"
+    assert summary["scan_page_url"] == "https://judol.example/"
+    assert summary["scan_http_status"] == 200
+    assert summary["scan_status"] == "done"
+    assert summary["scan_malicious"] is False
+    assert summary["scan_score"] == -12
+    assert "cdn.example" in summary["scan_contacted"]
+
+
+def test_summarize_scan_never_keeps_dom_content(monkeypatch):
+    """Isi DOM/HTML tidak boleh masuk ledger -- konten situs suspected
+    adalah attacker-controlled dan jalur ini nanti dikirim ke LLM."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    fake = FakeScan()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "page": {"title": "x", "url": "https://a.example/"},
+                "data": {
+                    "dom": "<html><body>instructions</body></html>",
+                    "lists": {"domains": ["a.example"]},
+                    "cookies": [{"name": "c", "value": "v"}],
+                    "console": [{"message": {"text": "m"}}],
+                },
+            },
+        )
+
+    with RealClient(transport=httpx.MockTransport(handler)) as client:
+        payload = probe.poll_result(client, "scan-uuid-1", timeout=5)
+
+    summary = probe.summarize_scan(payload)
+    blob = json.dumps(summary)
+
+    assert "instructions" not in blob
+    assert "dom" not in summary
+    assert "cookies" not in summary
+
+
+def test_merge_evidence_keeps_scan_fields():
+    old = {"a.com": {"total": 0, "uuids": [], "first_url": "", "first_scanned": "",
+                     "checked_at": 1, "scan_uuid": "u-old", "scan_status": "done",
+                     "scan_title": "Judul Lama"}}
+    rows = [{"domain": "a.com", "total": 0, "uuids": [],
+             "scan_uuid": "u-new", "scan_status": "done", "scan_title": "Judul Baru"}]
+
+    merged = probe.merge_evidence(old, rows, checked_at=2)
+
+    assert merged["a.com"]["scan_uuid"] == "u-new"
+    assert merged["a.com"]["scan_title"] == "Judul Baru"
+
+
+def test_merge_evidence_does_not_downgrade_done_to_pending():
+    """Scan yang sudah selesai tidak boleh ditimpa jadi pending oleh run
+    yang lebih baru -- itu memindahkan bukti ke keadaan lebih lemah."""
+    old = {"a.com": {"total": 0, "uuids": [], "first_url": "", "first_scanned": "",
+                     "checked_at": 1, "scan_uuid": "u-old", "scan_status": "done"}}
+    rows = [{"domain": "a.com", "total": 0, "uuids": [],
+             "scan_uuid": "u-new", "scan_status": "pending"}]
+
+    merged = probe.merge_evidence(old, rows, checked_at=2)
+
+    assert merged["a.com"]["scan_status"] == "done"
+    assert merged["a.com"]["scan_uuid"] == "u-old"
+
+
+def test_merge_evidence_keeps_old_scan_when_new_is_empty():
+    old = {"a.com": {"total": 0, "uuids": [], "first_url": "", "first_scanned": "",
+                     "checked_at": 1, "scan_uuid": "u-old", "scan_status": "done"}}
+    rows = [{"domain": "a.com", "total": 1, "uuids": ["x"]}]
+
+    merged = probe.merge_evidence(old, rows, checked_at=2)
+
+    assert merged["a.com"]["scan_uuid"] == "u-old"
+    assert merged["a.com"]["scan_status"] == "done"
+
+
+def test_write_evidence_persists_scan_fields(tmp_path):
+    path = tmp_path / "ev.json"
+    ledger = {"a.com": {"total": 0, "uuids": [], "first_url": "", "first_scanned": "",
+                         "checked_at": 1, "scan_uuid": "u1", "scan_status": "done",
+                         "scan_title": "X", "scan_contacted": ["a.com"]}}
+
+    probe.write_evidence(str(path), ledger, 1)
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    row = payload["domains"][0]
+    assert row["scan_uuid"] == "u1"
+    assert row["scan_status"] == "done"
+    assert row["scan_title"] == "X"
+    assert row["scan_contacted"] == ["a.com"]
+
+
+def test_main_does_not_rescan_domain_already_scanned(tmp_path, monkeypatch):
+    """Domain yang sudah punya scan_uuid di ledger tidak boleh di-scan lagi --
+    kuota harus dipakai untuk domain yang belum pernah diperiksa."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    monkeypatch.setenv("PROBE_API_KEY", "secret-123")
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\nb.com\n", encoding="utf-8")
+    ledger = tmp_path / "ev.json"
+    ledger.write_text(
+        json.dumps(
+            {
+                "schema": 1,
+                "generated_at": 1,
+                "domains": [
+                    {"domain": "a.com", "total": 0, "uuids": [],
+                     "scan_uuid": "u-old", "scan_status": "done", "checked_at": 1}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    fake = FakeScan()
+    monkeypatch.setattr(probe.httpx, "Client", lambda **kw: fake.client())
+
+    probe.main([
+        "--domains", str(domains),
+        "--limit", "2",
+        "--sleep", "0",
+        "--submit-scan",
+        "--max-submit", "2",
+        "--poll-seconds", "1",
+        "--merge-out", str(ledger),
+    ])
+
+    # hanya b.com yang boleh/request scan; a.com dilewati
+    scanned = [p["url"] for p in fake.posts]
+    assert scanned == ["https://b.com"]
+
+
+def test_main_disables_request_scan_without_api_key(tmp_path, monkeypatch, capsys):
+    """Tanpa API key, search tetap jalan dan mode request scan dimatikan."""
+    monkeypatch.setattr(probe.time, "sleep", lambda _s: None)
+    monkeypatch.delenv("PROBE_API_KEY", raising=False)
+    domains = tmp_path / "domain.txt"
+    domains.write_text("a.com\n", encoding="utf-8")
+
+    fake = FakeScan()
+    monkeypatch.setattr(probe.httpx, "Client", lambda **kw: fake.client())
+
+    code = probe.main([
+        "--domains", str(domains),
+        "--limit", "1",
+        "--sleep", "0",
+        "--submit-scan",
+        "--max-submit", "2",
+        "--poll-seconds", "1",
+    ])
+
+    assert code == 0
+    assert fake.posts == [], "tidak boleh ada scan yang diminta tanpa API key"
+    assert "dimatikan" in capsys.readouterr().err
+
+
+# --------------------------------------------------------------------------
 # ringkasan
 # --------------------------------------------------------------------------
 

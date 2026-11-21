@@ -7,7 +7,10 @@ Diagrams of the pipeline **as it actually runs today**. Rendered with Mermaid.
 - [3. `fetch_range`](#3-fetch_range)
 - [4. Entry handler](#4-entry-handler)
 - [5. Cursor state rules](#5-cursor-state-rules)
-- [6. CI workflow](#6-ci-workflow)
+- [6. CI workflow (`ct-grab`)](#6-ci-workflow-ct-grab)
+- [7. `probe.py` — search & request scan](#7-probepy--search--request-scan)
+- [8. CI workflow (`urlscan-evidence`)](#8-ci-workflow-urlscan-evidence)
+- [9. CI workflow (`classify`)](#9-ci-workflow-classify)
 
 ---
 
@@ -283,7 +286,7 @@ flowchart LR
 
 ---
 
-## 6. CI workflow
+## 6. CI workflow (`ct-grab`)
 
 `.github/workflows/ct-grab.yml` — cron `23 */6 * * *`, 30-minute job timeout,
 `concurrency` group with `cancel-in-progress: false` so two runs never race on
@@ -318,3 +321,222 @@ flowchart TD
 
 `ct.db` and `domain.txt` are staged in the same `git add`. That is what makes the
 rollback consistent — the two must never be committed separately.
+
+---
+
+## 7. `probe.py` — search & request scan
+
+`probe.py` does two things in a single pass over the sampled domains:
+
+1. **Search** (`GET /api/v1/search/`) — find scans that already exist.
+2. **Request scan** (`POST /api/v1/scan/`) — submit a URL for domains with no
+   existing scan, then poll for the result.
+
+```mermaid
+flowchart TD
+    Start(["python probe.py"]) --> CLI["Parse CLI<br/>--submit-scan, --max-submit,<br/>--visibility, --poll-seconds"]
+
+    CLI --> Quota{"--check-quota?"}
+    Quota -- yes --> PrintQ["GET /api/v1/quotas<br/>print + exit"] --> EndOK
+
+    Quota -- no --> LoadDom["load_candidates<br/>domain.txt"]
+    LoadDom --> Sample["pick_sample<br/>(limit, seed)"]
+    Sample --> APIKey{"PROBE_API_KEY<br/>set?"}
+    APIKey -- no --> DisableScan["submit_budget = 0<br/>search only"]
+    APIKey -- yes --> KeyOK["headers['API-Key'] = key"]
+    DisableScan --> ReadLedger
+    KeyOK --> ReadLedger
+
+    ReadLedger{"--merge-out?"} -- yes --> LoadEvid["load_evidence<br/>existing ledger"]
+    ReadLedger -- no --> EmptyEvid["existing = {}"]
+    LoadEvid --> Loop
+    EmptyEvid --> Loop
+
+    Loop{{"Next domain"}} -- none left --> Summary
+    Loop -- has next --> Search["GET /api/v1/search/<br/>domain:__domain__"]
+
+    Search -- error --> Fail{">= max_failures<br/>berturut-turut?"}
+    Fail -- yes --> Stop["BERHENTI"] --> Summary
+    Fail -- no --> Loop
+
+    Search -- ok --> Row["row = {domain, total,<br/>uuids, first_url, ...}"]
+
+    Row --> ShouldScan{"--submit-scan<br/>AND total == 0<br/>AND budget > 0?"}
+
+    ShouldScan -- no --> Append
+    ShouldScan -- yes --> Already{"ledger punya<br/>scan_uuid atau<br/>scan_pending_uuid?"}
+    Already -- yes --> Append
+
+    Already -- no --> Submit["POST /api/v1/scan/<br/>{url, visibility}<br/>budget -= 1"]
+    Submit -- error --> SubmitFail["stderr: gagal<br/>lanjut"] --> Append
+    Submit -- ok --> Poll["poll_result<br/>GET /api/v1/result/{uuid}/<br/>wait up to poll-seconds"]
+
+    Poll -- done --> Summarize["summarize_scan<br/>title, page_url, http_status,<br/>contacted, verdict, screenshot"]
+    Summarize --> SetDone["scan_uuid = uuid<br/>scan_status = done"]
+    SetDone --> Sleep1{"submit_sleep<br/>& budget > 0?"}
+    Sleep1 -- yes --> Zzz["time.sleep"] --> Append
+    Sleep1 -- no --> Append
+
+    Poll -- timeout --> Pending["scan_pending_uuid = uuid<br/>scan_status = pending"]
+    Pending --> Sleep1
+
+    Append["rows.append(row)<br/>print status"] --> SleepN{"index < len?"}
+    SleepN -- yes --> SleepD["time.sleep(sleep)"] --> Loop
+    SleepN -- no --> Loop
+
+    Summary["summarize(rows)"] --> MergeQ{"--merge-out?"}
+    MergeQ -- yes --> Merge["merge_evidence<br/>union uuids, max total,<br/>preserve done scan"]
+    Merge --> Write["write_evidence<br/>urlscan-evidence.json"]
+    Write --> JsonQ
+    MergeQ -- no --> JsonQ{"--json-out?"}
+    JsonQ -- yes --> JsonOut["write JSON"] --> EndOK
+    JsonQ -- no --> EndOK(["exit 0"])
+
+    classDef err fill:#fde2e2,stroke:#c0392b
+    class Stop,SubmitFail err
+    classDef ok fill:#e8f8f5,stroke:#1abc9c
+    class EndOK ok
+```
+
+### Merge rules
+
+```mermaid
+flowchart LR
+    subgraph Evidence ["Scan evidence fields"]
+      A["scan_uuid<br/>scan_status<br/>scan_title<br/>scan_page_url<br/>scan_http_status<br/>scan_screenshot<br/>scan_contacted<br/>scan_malicious<br/>scan_score<br/>scan_scanned_at"]
+    end
+    subgraph Pending ["Pending fields"]
+      B["scan_pending_uuid"]
+    end
+
+    New{"new status?"} -- done --> Replace["Replace ALL evidence<br/>from new row<br/>(clean slate)"]
+    New -- not done --> Old{"old status?"}
+    Old -- done --> Keep["Keep ALL old evidence<br/>(never downgrade)"]
+    Old -- not done --> Empty["No evidence<br/>either side"]
+
+    B --> PNew{"new pending<br/>uuid?"}
+    PNew -- yes --> TakeNew["Take new"]
+    PNew -- no --> TakeOld["Keep old"]
+```
+
+### `summarize_scan` — only metadata, never DOM
+
+```mermaid
+flowchart LR
+    Payload["urlscan result<br/>payload"] --> Safe["EXTRACTED:<br/>page.title · page.url ·<br/>page.status · task.screenshotURL ·<br/>lists.domains · verdicts.overall"]
+    Payload -.-x|"NEVER READ"| Danger["data.dom · data.cookies ·<br/>data.console · data.requests[].body"]
+    style Danger fill:#fde2e2,stroke:#c0392b,stroke-width:2px
+```
+
+---
+
+## 8. CI workflow (`urlscan-evidence`)
+
+`.github/workflows/urlscan-evidence.yml` — daily at 04:17 UTC, also manual.
+Commits `urlscan-evidence.json` to repo. `contents: write`.
+
+```mermaid
+flowchart TD
+    Trigger["schedule: 17 4 * * *<br/>or workflow_dispatch"] --> Co{"another run<br/>in progress?"}
+    Co -- yes --> Queue["queue — do NOT cancel<br/>(ledger must not race)"]
+    Queue --> Co
+
+    Co -- no --> Checkout["actions/checkout@v7"]
+    Checkout --> Py["setup-python 3.13<br/>pip cache"]
+    Py --> Deps["pip install requirements.txt pytest"]
+    Deps --> Test["pytest -q"]
+
+    Test -- fail --> Stop["job fails<br/>nothing committed"]
+    Test -- ok --> Validate["Validate inputs<br/>limit, size, sleep,<br/>max_submit, visibility,<br/>poll_seconds"]
+
+    Validate --> APICheck{"URLSCAN_API_KEY<br/>set?"}
+    APICheck -- yes --> SetKey["export PROBE_API_KEY"]
+    APICheck -- no --> NoKey["search only<br/>(submit-scan disabled)"]
+
+    SetKey --> Probe
+    NoKey --> Probe
+
+    Probe["probe.py<br/>--submit-scan --max-submit N<br/>--merge-out urlscan-evidence.json"]
+
+    Probe --> CommitStep["git add urlscan-evidence.json"]
+    CommitStep --> Diff{"git diff<br/>cached empty?"}
+    Diff -- yes --> Noop["no changes<br/>skip commit"]
+    Diff -- no --> Commit["git commit<br/>'evidence: urlscan &lt;timestamp&gt;'"]
+    Commit --> Rebase["git pull --rebase origin main"]
+    Rebase --> Push["git push origin main"]
+
+    Noop --> Upload
+    Push --> Upload["upload-artifact<br/>urlscan-evidence.json<br/>probe-result.json"]
+    Upload --> Done(["done"])
+
+    classDef err fill:#fde2e2,stroke:#c0392b
+    class Stop err
+    classDef ok fill:#e8f8f5,stroke:#1abc9c
+    class Noop,Done ok
+```
+
+Key properties:
+- **Commit before rebase**: `git pull --rebase` refuses to run with uncommitted
+  changes, so `git commit` happens first. The file we touch
+  (`urlscan-evidence.json`) does not conflict with other workflows (`ct-grab`
+  writes `domain.txt`, `ct.db`, `stats.json`).
+- **`if: always()`** on the commit step: even if probe hits a quota wall, the
+  partial ledger is committed so the next run can build on it.
+- **Concurrency serialized** (`cancel-in-progress: false`): two runs never race
+  on the same ledger.
+
+---
+
+## 9. CI workflow (`classify`)
+
+`.github/workflows/classify.yml` — daily at 07:41 UTC, also manual.
+Read-only: results go to artifacts, never committed (unreviewed LLM output).
+
+```mermaid
+flowchart TD
+    Trigger["schedule: 41 7 * * *<br/>or workflow_dispatch"] --> Co{"another run<br/>in progress?"}
+    Co -- yes --> Queue["queue"] --> Co
+
+    Co -- no --> Checkout["actions/checkout@v7"]
+    Checkout --> Py["setup-python 3.13"]
+    Py --> Deps["pip install"]
+    Deps --> Test["pytest -q"]
+
+    Test -- fail --> Stop["job fails"]
+    Test -- ok --> CheckKey{"GEMINI_API_KEY<br/>set?"}
+    CheckKey -- no --> NoKey["::error::Secret belum diset<br/>exit 1"]
+    CheckKey -- yes --> KeyOK
+
+    KeyOK --> Seed["SEED = inputs.seed<br/>or day-of-year"]
+
+    Seed --> Ledger{"urlscan-evidence.json<br/>exists in repo?"}
+
+    Ledger -- yes --> UseLedger["EVIDENCE_ARG=<br/>--evidence urlscan-evidence.json<br/>(zero urlscan quota)"]
+    Ledger -- no --> FallbackProbe["python probe.py<br/>--json-out hasil/probe.json"]
+
+    FallbackProbe -- ok --> UseProbe["EVIDENCE_ARG=<br/>--evidence hasil/probe.json"]
+    FallbackProbe -- fail --> NoEvidence["::warning::probe gagal<br/>classify tanpa bukti"]
+
+    UseLedger --> Classify
+    UseProbe --> Classify
+    NoEvidence --> Classify
+
+    Classify["python classify.py<br/>--domains domain.txt<br/>--limit N --seed SEED<br/>$EVIDENCE_ARG<br/>--out-dir hasil"]
+
+    Classify --> Upload["upload-artifact<br/>blocklist.txt · whitelist.txt ·<br/>review.txt · classify-result.json"]
+    Upload --> Done(["done"])
+
+    classDef err fill:#fde2e2,stroke:#c0392b
+    class Stop,NoKey err
+    classDef ok fill:#e8f8f5,stroke:#1abc9c
+    class Done ok
+    classDef warn fill:#fff4d6,stroke:#d68910
+    class NoEvidence warn
+```
+
+The critical design: `classify.yml` **prefers the committed ledger** over calling
+urlscan.io itself. When `urlscan-evidence.json` exists (committed by the
+`urlscan-evidence` workflow), the classify job uses it directly — zero urlscan
+quota spent. The fallback probe runs only if the ledger doesn't exist yet
+(first-ever run). Day-of-year seeding ensures different domains get classified
+each day on scheduled runs.

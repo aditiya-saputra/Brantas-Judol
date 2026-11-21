@@ -29,6 +29,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`probe.py` can now REQUEST a scan, not just search for one.** `--submit-scan`
+  submits `POST /api/v1/scan` for domains that have no scan at all, polls
+  `GET /api/v1/result/{uuid}/` until the result is ready, and records the
+  metadata it finds: page title, final URL, HTTP status, the hosts the page
+  contacted, and urlscan's own verdict. `--max-submit` (default 3),
+  `--visibility`, `--poll-seconds`, `--submit-sleep` and `--scan-url-template`
+  control it; `--check-quota` prints the API key's remaining budget.
+  - Only for domains with **no** existing scan — a domain that already has one
+    keeps it.
+  - **Never twice for the same domain**: the ledger records `scan_uuid`, so a
+    domain scanned by an earlier run is skipped and the quota is not burned.
+  - A `429` from urlscan.io is handled, not fatal — the domain is skipped and
+    the run continues.
+  - Requires an API key with `write` scope. Without it, search still works and
+    the request-scan mode disables itself with a warning.
+  - **Only metadata is stored.** DOM content, cookies and console output are
+    never read — that content is attacker-controlled and the project rule is
+    that it never reaches the model.
+- **`scan_uuid` and `scan_pending_uuid` are stored separately.** A scan still
+  running must never overwrite the evidence of a scan that already completed,
+  and a finished scan replaces the previous evidence wholesale so no stale
+  metadata survives.
+- 14 new tests on `httpx.MockTransport` — no network — covering submit,
+  poll, the metadata summary, the "no DOM content" rule, the
+  never-scan-twice rule, and the done/pending separation.
 - **The evidence ledger `urlscan-evidence.json`, committed to the repo.**
   `probe.py` gains `--merge-out`: instead of overwriting, each run merges its
   urlscan.io search results into a ledger keyed by domain

@@ -45,12 +45,29 @@ VERSION = "0.1"
 USER_AGENT = f"brantas-judol-probe/{VERSION} (+mailto:aditiya.saputrax1x2@gmail.com)"
 
 SEARCH_URL = "https://urlscan.io/api/v1/search/"
+# Endpoint untuk MEMINTA scan (bukan hanya mencari scan yang sudah ada).
+# Butuh API key dengan scope write.
+SCAN_URL = "https://urlscan.io/api/v1/scan/"
+RESULT_URL = "https://urlscan.io/api/v1/result/{uuid}/"
+QUOTAS_URL = "https://urlscan.io/api/v1/quotas"
 
 # Kuota urlscan tidak dipublikasikan. Default dibuat kecil dan jarak antar
 # request lebar supaya run pertama tidak langsung kena limit.
 DEFAULT_LIMIT = 25
 DEFAULT_SIZE = 1
 DEFAULT_SLEEP = 6.0
+
+# Batas untuk mode "request scan".
+DEFAULT_MAX_SUBMIT = 3
+DEFAULT_POLL_SECONDS = 45.0
+DEFAULT_SUBMIT_SLEEP = 15.0
+DEFAULT_VISIBILITY = "public"
+DEFAULT_SCAN_URL_TEMPLATE = "https://{domain}"
+
+# Berapa banyak host yang ikut dicatat per hasil scan. Scan situs judi bisa
+# menyentuh ratusan host (iklan, tracker, CDN); cukup daftar pendek supaya
+# ledger tetap ringan.
+MAX_CONTACTED = 15
 
 RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 
@@ -180,6 +197,165 @@ def summarize(rows: list[dict]) -> str:
 
 
 # --------------------------------------------------------------------------
+# Request scan (kirim URL ke urlscan.io untuk dipindai)
+# --------------------------------------------------------------------------
+
+
+def check_quota(client: httpx.Client) -> dict:
+    """Ambil status kuota API key. Kosong kalau endpoint tidak bisa dibaca."""
+    try:
+        resp = client.get(QUOTAS_URL)
+    except httpx.HTTPError:
+        return {}
+    if resp.status_code != 200:
+        return {}
+    try:
+        payload = resp.json()
+    except ValueError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def submit_scan(
+    client: httpx.Client,
+    domain: str,
+    visibility: str = DEFAULT_VISIBILITY,
+    url_template: str = DEFAULT_SCAN_URL_TEMPLATE,
+    retries: int = 3,
+) -> str:
+    """Minta urlscan.io memindai satu domain. Kembalikan uuid scan.
+
+    String kosong / exception berarti gagal -- pemanggil harus lanjut ke
+    domain berikutnya, bukan menggagalkan seluruh run. Kuota scan urlscan per
+    menit terbatas, jadi 429 itu hal yang wajar dan harus ditangani, bukan
+    error fatal.
+    """
+    target = url_template.format(domain=domain)
+    body = {"url": target, "visibility": visibility}
+    delay = 10.0
+    last: Optional[str] = None
+
+    for attempt in range(retries):
+        if attempt:
+            time.sleep(delay)
+            delay *= 2.0
+        try:
+            resp = client.post(SCAN_URL, json=body)
+        except httpx.HTTPError as exc:
+            last = f"{type(exc).__name__}: {exc}"
+            continue
+
+        if resp.status_code in RETRYABLE_STATUS:
+            last = f"HTTP {resp.status_code}"
+            retry_after = resp.headers.get("retry-after", "").strip()
+            if retry_after.isdigit():
+                delay = max(1.0, float(retry_after))
+            continue
+        if resp.status_code >= 400:
+            # 401/403 = API key tidak punya scope write. Fatal untuk mode
+            # ini, tapi tidak untuk seluruh run.
+            raise ProbeError(f"HTTP {resp.status_code}: {resp.text[:200]}")
+
+        try:
+            payload = resp.json()
+        except ValueError as exc:
+            last = f"respons bukan JSON: {exc}"
+            continue
+
+        uuid = str(payload.get("uuid") or "")
+        if uuid:
+            return uuid
+        last = f"respons tanpa uuid: {str(payload)[:120]}"
+
+    raise RateLimited(f"gagal request scan untuk {domain}: {last}")
+
+
+def poll_result(
+    client: httpx.Client,
+    uuid: str,
+    timeout: float = DEFAULT_POLL_SECONDS,
+    interval: float = 5.0,
+) -> Optional[dict]:
+    """Tunggu hasil scan. None kalau belum selesai dalam batas waktu.
+
+    Dokumentasi urlscan menyarankan menunggu ~10 detik sebelum polling, lalu
+    polling tiap 2 detik. Di sini intervalnya lebih longgar supaya tidak
+    menyalahi kuota API.
+    """
+    deadline = time.monotonic() + timeout
+    # Dokumentasi urlscan menyarankan menunggu ~10 detik sebelum polling.
+    # Tidur dibatasi seperempat timeout supaya sisa waktu masih cukup untuk
+    # polling -- kalau tidak, timeout pendek habis hanya untuk tidur.
+    time.sleep(min(10.0, max(0.0, timeout * 0.25)))
+
+    while time.monotonic() < deadline:
+        try:
+            resp = client.get(RESULT_URL.format(uuid=uuid))
+        except httpx.HTTPError:
+            time.sleep(interval)
+            continue
+
+        if resp.status_code == 200:
+            try:
+                payload = resp.json()
+            except ValueError:
+                return None
+            return payload if isinstance(payload, dict) else None
+        # 404 = scan masih berjalan. 429/5xx = coba lagi nanti.
+        time.sleep(interval)
+    return None
+
+
+def summarize_scan(payload: dict) -> dict:
+    """Ambil metadata yang aman dari hasil scan.
+
+    Yang diambil HANYA metadata: judul halaman, URL, status HTTP, host yang
+    dihubungi, dan verdict urlscan. Isi DOM / HTML tidak pernah diambil --
+    konten situs suspected adalah attacker-controlled dan tidak boleh masuk
+    ke jalur yang nanti dikirim ke LLM.
+    """
+    out: dict = {}
+
+    page = payload.get("page") or {}
+    task = payload.get("task") or {}
+
+    title = str(page.get("title") or "").strip()
+    if title:
+        out["scan_title"] = title[:300]
+    page_url = str(page.get("url") or "")
+    if page_url:
+        out["scan_page_url"] = page_url[:500]
+    status = page.get("status")
+    if status is not None:
+        try:
+            out["scan_http_status"] = int(status)
+        except (TypeError, ValueError):
+            pass
+    shot = str(task.get("screenshotURL") or "")
+    if shot:
+        out["scan_screenshot"] = shot[:300]
+
+    contacted = payload.get("lists") or {}
+    domains = contacted.get("domains") or []
+    if isinstance(domains, list):
+        out["scan_contacted"] = [str(d)[:253] for d in domains[:MAX_CONTACTED]]
+
+    verdicts = payload.get("verdicts") or {}
+    overall = verdicts.get("overall") or {}
+    if "malicious" in overall:
+        out["scan_malicious"] = bool(overall.get("malicious"))
+    if "score" in overall:
+        try:
+            out["scan_score"] = int(overall.get("score"))
+        except (TypeError, ValueError):
+            pass
+
+    out["scan_status"] = "done"
+    out["scan_scanned_at"] = int(time.time())
+    return out
+
+
+# --------------------------------------------------------------------------
 # Ledger bukti (yang di-commit ke repo)
 # --------------------------------------------------------------------------
 
@@ -189,6 +365,28 @@ EVIDENCE_SCHEMA = 1
 # dan yang disimpan ke repo tidak perlu lengkap -- cukup beberapa halaman hasil
 # terbaru untuk jadi rujukan.
 MAX_UUIDS_PER_DOMAIN = 50
+
+# Field hasil scan yang ikut disimpan di ledger. Datar dibuat datar (bukan
+# nested) supaya penggabungan antar-run tetap sederhana.
+#
+# Bukti scan yang sudah SELESAI (scan_uuid) dipisah dari scan yang baru
+# diminta tapi belum selesai (scan_pending_uuid). Kalau keduanya bercampur,
+# scan yang sudah selesai bisa tertimpa uuid scan yang masih jalan -- dan
+# bukti yang sudah ada hilang.
+SCAN_EVIDENCE_FIELDS = (
+    "scan_uuid",
+    "scan_status",
+    "scan_title",
+    "scan_page_url",
+    "scan_http_status",
+    "scan_screenshot",
+    "scan_contacted",
+    "scan_malicious",
+    "scan_score",
+    "scan_scanned_at",
+)
+SCAN_PENDING_FIELDS = ("scan_pending_uuid",)
+SCAN_FIELDS = SCAN_EVIDENCE_FIELDS + SCAN_PENDING_FIELDS
 
 
 def load_evidence(path: str) -> dict[str, dict]:
@@ -231,6 +429,9 @@ def load_evidence(path: str) -> dict[str, dict]:
             "first_scanned": str(item.get("first_scanned") or ""),
             "checked_at": int(item.get("checked_at") or 0),
         }
+        for field in SCAN_FIELDS:
+            if field in item and item[field] not in (None, "", [], {}):
+                ledger[domain][field] = item[field]
     return ledger
 
 
@@ -265,6 +466,32 @@ def merge_evidence(
             ),
             "checked_at": checked_at,
         }
+        # Bukti scan: perlakukan "done" dan "pending" sebagai dua keadaan
+        # yang berbeda, bukan dua versi dari data yang sama.
+        old_status = str(old.get("scan_status") or "")
+        new_status = str(row.get("scan_status") or "")
+
+        if new_status == "done":
+            # Scan baru selesai: ganti bukti lama sepenuhnya, supaya tidak
+            # ada sisa metadata dari scan sebelumnya yang ikut terbawa.
+            for field in SCAN_EVIDENCE_FIELDS:
+                merged[domain].pop(field, None)
+                if field in row and row[field] not in (None, "", [], {}):
+                    merged[domain][field] = row[field]
+        elif old_status == "done":
+            # Run ini tidak menghasilkan scan yang selesai. Bukti lama
+            # dibiarkan utuh -- lebih baik data lama daripada bukti hilang.
+            for field in SCAN_EVIDENCE_FIELDS:
+                if field in old and old[field] not in (None, "", [], {}):
+                    merged[domain][field] = old[field]
+
+        for field in SCAN_PENDING_FIELDS:
+            new_value = row.get(field)
+            old_value = old.get(field)
+            if new_value not in (None, "", [], {}):
+                merged[domain][field] = new_value
+            elif old_value not in (None, "", [], {}):
+                merged[domain][field] = old_value
     return merged
 
 
@@ -283,17 +510,19 @@ def write_evidence(
         # Batas ditegakkan lagi di sini: ini penulis terakhir, jadi ledger
         # yang ditulis tidak boleh lebih besar dari kapasitas.
         uuids = list(data.get("uuids") or [])[:MAX_UUIDS_PER_DOMAIN]
-        domains_out.append(
-            {
-                "domain": domain,
-                "total": data.get("total", 0),
-                "uuids": uuids,
-                "first_uuid": uuids[0] if uuids else "",
-                "first_url": data.get("first_url", ""),
-                "first_scanned": data.get("first_scanned", ""),
-                "checked_at": data.get("checked_at", 0),
-            }
-        )
+        entry = {
+            "domain": domain,
+            "total": data.get("total", 0),
+            "uuids": uuids,
+            "first_uuid": uuids[0] if uuids else "",
+            "first_url": data.get("first_url", ""),
+            "first_scanned": data.get("first_scanned", ""),
+            "checked_at": data.get("checked_at", 0),
+        }
+        for field in SCAN_FIELDS:
+            if field in data and data[field] not in (None, "", [], {}):
+                entry[field] = data[field]
+        domains_out.append(entry)
 
     payload = {
         "schema": EVIDENCE_SCHEMA,
@@ -346,6 +575,48 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="berhenti setelah N request gagal berturut-turut (default: 3)",
     )
     parser.add_argument(
+        "--submit-scan",
+        action="store_true",
+        help=(
+            "minta urlscan.io memindai domain yang belum punya scan "
+            "(butuh API key dengan scope write)"
+        ),
+    )
+    parser.add_argument(
+        "--visibility",
+        default=DEFAULT_VISIBILITY,
+        choices=["public", "unlisted", "private"],
+        help=f"visibilitas scan yang diminta (default: {DEFAULT_VISIBILITY})",
+    )
+    parser.add_argument(
+        "--max-submit",
+        type=int,
+        default=DEFAULT_MAX_SUBMIT,
+        help=f"jumlah scan yang boleh diminta per run (default: {DEFAULT_MAX_SUBMIT})",
+    )
+    parser.add_argument(
+        "--poll-seconds",
+        type=float,
+        default=DEFAULT_POLL_SECONDS,
+        help=f"tunggu hasil scan, batas atas detik (default: {DEFAULT_POLL_SECONDS:.0f})",
+    )
+    parser.add_argument(
+        "--submit-sleep",
+        type=float,
+        default=DEFAULT_SUBMIT_SLEEP,
+        help=f"jeda antar permintaan scan (default: {DEFAULT_SUBMIT_SLEEP:.0f})",
+    )
+    parser.add_argument(
+        "--scan-url-template",
+        default=DEFAULT_SCAN_URL_TEMPLATE,
+        help=f"template URL yang dikirim (default: {DEFAULT_SCAN_URL_TEMPLATE})",
+    )
+    parser.add_argument(
+        "--check-quota",
+        action="store_true",
+        help="tampilkan status kuota API lalu keluar",
+    )
+    parser.add_argument(
         "--merge-out",
         help=(
             "ledger bukti yang di-commit ke repo; hasil run ini digabung "
@@ -388,6 +659,34 @@ def main(argv: Optional[list[str]] = None) -> int:
         follow_redirects=True,
         headers=headers,
     )
+
+    if args.check_quota:
+        quota = check_quota(client)
+        client.close()
+        if not quota:
+            print("[quota] endpoint kuota tidak bisa dibaca (API key tanpa scope read?)")
+            return 1
+        print("[quota]", json.dumps(quota, indent=2, ensure_ascii=False))
+        return 0
+
+    # Domain yang sudah pernah kita scan sendiri tidak perlu di-scan lagi --
+    # baca ledger dulu supaya kuota tidak terbuang untuk domain yang sama.
+    existing: dict[str, dict] = load_evidence(args.merge_out) if args.merge_out else {}
+    submit_budget = max(0, args.max_submit) if args.submit_scan else 0
+    if args.submit_scan and not api_key:
+        # Endpoint scan butuh API key dengan scope write. Tanpa key, search
+        # tetap jalan -- hanya mode request scan yang dimatikan.
+        print(
+            "[request scan] dimatikan: PROBE_API_KEY belum di-set",
+            file=sys.stderr,
+        )
+        submit_budget = 0
+    if args.submit_scan and submit_budget > 0:
+        print(
+            f"request scan : aktif | maks {submit_budget} per run | "
+            f"visibilitas {args.visibility}"
+        )
+
     try:
         for index, domain in enumerate(sample, 1):
             try:
@@ -415,8 +714,61 @@ def main(argv: Optional[list[str]] = None) -> int:
                     break
                 continue
             failures = 0
+
+            # Request scan: hanya untuk domain yang belum punya scan sama
+            # sekali, dan hanya kalau domain itu belum pernah kita scan
+            # sendiri -- supaya kuota tidak terbuang untuk domain yang sama
+            # di setiap run.
+            if submit_budget > 0 and not row["total"]:
+                previous = existing.get(domain) or {}
+                # Jangan scan ulang domain yang sudah kita scan (selesai) atau
+                # yang scan-nya sedang menunggu -- kuota harus dipakai untuk
+                # domain yang belum pernah diperiksa.
+                already = previous.get("scan_uuid") or previous.get("scan_pending_uuid")
+                if not already:
+                    submit_budget -= 1
+                    uuid = ""
+                    try:
+                        uuid = submit_scan(
+                            client,
+                            domain,
+                            args.visibility,
+                            args.scan_url_template,
+                        )
+                    except ProbeError as exc:
+                        print(
+                            f"  [{index}/{len(sample)}] {domain}: "
+                            f"request scan gagal: {exc}",
+                            file=sys.stderr,
+                        )
+                    if uuid:
+                        row["scan_pending_uuid"] = uuid
+                        row["scan_status"] = "requested"
+                        print(f"  [{index}/{len(sample)}] {domain}: scan diminta ({uuid})")
+                        payload = poll_result(client, uuid, args.poll_seconds)
+                        if payload:
+                            row.update(summarize_scan(payload))
+                            row["scan_uuid"] = uuid
+                            row.pop("scan_pending_uuid", None)
+                            detail = row.get("scan_title") or row.get("scan_page_url") or "(tanpa judul)"
+                            print(f"  [{index}/{len(sample)}] {domain}: scan selesai -> {detail}")
+                        else:
+                            # Belum selesai: uuid tetap dicatat supaya run
+                            # berikutnya bisa mengambil hasilnya tanpa scan ulang.
+                            row["scan_status"] = "pending"
+                            print(
+                                f"  [{index}/{len(sample)}] {domain}: "
+                                "scan belum selesai, dicatat sebagai pending"
+                            )
+                        if args.submit_sleep > 0 and submit_budget > 0:
+                            time.sleep(args.submit_sleep)
+
             rows.append(row)
             status = f"{row['total']} scan" if row["total"] else "tidak ada scan"
+            if row.get("scan_status") == "done":
+                status += " + scan baru"
+            elif row.get("scan_status") == "pending":
+                status += " + scan pending"
             print(f"  [{index}/{len(sample)}] {domain}: {status}")
             if index < len(sample) and args.sleep > 0:
                 time.sleep(args.sleep)

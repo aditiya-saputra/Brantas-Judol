@@ -232,7 +232,10 @@ def classify(
             continue
 
         if resp.status_code in (429, 500, 502, 503, 504):
-            last = f"HTTP {resp.status_code}"
+            # Body error ikut diambil: "HTTP 429" saja tidak menjelaskan
+            # apakah ini rate limit sesaat atau kuota harian sudah habis.
+            detail = resp.text.strip().replace("\n", " ")[:200]
+            last = f"HTTP {resp.status_code}" + (f" ({detail})" if detail else "")
             retry_after = resp.headers.get("retry-after", "").strip()
             if retry_after.isdigit():
                 delay = max(1.0, float(retry_after))

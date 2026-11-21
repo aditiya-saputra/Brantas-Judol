@@ -302,6 +302,13 @@ python probe.py --limit 50 --size 5 --sleep 4 --seed 42 --json-out probe.json
 | `--max-failures` | `3` | Stop after N consecutive failed requests |
 | `--json-out` | — | Write results as JSON |
 | `--merge-out` | — | Merge results into the committed evidence ledger |
+| `--submit-scan` | off | **Request** a scan for domains that have none |
+| `--max-submit` | `3` | Scan requests allowed per run |
+| `--visibility` | `public` | `public` / `unlisted` / `private` |
+| `--poll-seconds` | `45` | Upper bound on waiting for a scan result |
+| `--submit-sleep` | `15` | Delay between scan requests |
+| `--scan-url-template` | `https://{domain}` | URL submitted for scanning |
+| `--check-quota` | — | Print API quota status and exit |
 
 Set `PROBE_API_KEY` to send an `API-Key` header. Without it the script still
 runs — the endpoint is public — but you get the anonymous quota.
@@ -313,6 +320,41 @@ same 25 domains twice and waste urlscan.io quota, so the read-only probe
 workflow was left manual, with a larger budget for one-off deep runs. It
 sends `secrets.URLSCAN_API_KEY` when that secret exists, uploads
 `probe-result.json` as an artifact (kept 14 days), and never commits.
+
+### Requesting a scan (not just searching)
+
+Search only finds scans that already exist. For a domain that was never
+scanned, `probe.py` can **ask** urlscan.io to scan it:
+
+```bash
+python probe.py --limit 25 --submit-scan --max-submit 3 --merge-out urlscan-evidence.json
+```
+
+| Step | Endpoint | What it does |
+|---|---|---|
+| Submit | `POST /api/v1/scan` | `{"url": "https://<domain>", "visibility": "public"}` → `uuid` |
+| Poll | `GET /api/v1/result/{uuid}/` | wait ~10s, then poll until the result is ready |
+| Quota | `GET /api/v1/quotas` | `--check-quota` prints the key's remaining budget |
+
+Rules the implementation follows:
+
+- **Only for domains with no scan at all.** A domain that already has one
+  keeps it — quota is not spent re-scanning what is known.
+- **Never twice for the same domain.** The ledger records `scan_uuid`, so a
+  domain scanned by an earlier run is skipped.
+- **`--max-submit` caps it.** urlscan.io rate-limits scan submissions
+  (roughly one per minute on a free key), so the cap and `--submit-sleep`
+  keep a run inside the limit. A `429` is handled, not fatal: the domain is
+  skipped and the run continues.
+- **API key needs `write` scope.** Without it, search still works and the
+  request-scan mode turns itself off with a warning.
+- **Only metadata is kept.** Page title, final URL, HTTP status, the hosts
+  the page contacted, and urlscan's own verdict. DOM content, cookies and
+  console output are never read — that content is attacker-controlled.
+
+`scan_uuid` (a finished scan) and `scan_pending_uuid` (a scan still running)
+are stored separately: a pending scan must never overwrite the evidence of a
+scan that already completed.
 
 ### The evidence ledger (`urlscan-evidence.json`)
 
@@ -329,6 +371,7 @@ python probe.py --limit 25 --merge-out urlscan-evidence.json
 | Format | `{"schema": 1, "generated_at": <unix>, "domains": [...]}` |
 | Keyed by | domain |
 | Per domain | `total`, `uuids[]`, `first_url`, `first_scanned`, `checked_at` |
+| Scan fields | `scan_uuid`, `scan_status`, `scan_title`, `scan_page_url`, `scan_http_status`, `scan_screenshot`, `scan_contacted[]`, `scan_malicious`, `scan_score` |
 | Merge rule | `uuids` are **unioned**, never overwritten — evidence found once stays |
 | Cap | 50 uuid per domain |
 | Ordering | domains sorted, so a repo diff appears only when the data really changed |

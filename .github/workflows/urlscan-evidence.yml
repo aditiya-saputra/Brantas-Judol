@@ -42,6 +42,18 @@ on:
         description: 'Seed sampel (run dengan seed sama = himpunan sama)'
         required: false
         default: '0'
+      max_submit:
+        description: 'Jumlah scan yang boleh diminta per run (butuh API key scope write)'
+        required: false
+        default: '3'
+      visibility:
+        description: 'Visibilitas scan yang diminta'
+        required: false
+        default: 'public'
+      poll_seconds:
+        description: 'Tunggu hasil scan, batas atas detik'
+        required: false
+        default: '45'
 
 permissions:
   contents: write
@@ -76,6 +88,9 @@ jobs:
           INPUT_SIZE: ${{ inputs.size }}
           INPUT_SLEEP: ${{ inputs.sleep }}
           INPUT_SEED: ${{ inputs.seed }}
+          INPUT_MAX_SUBMIT: ${{ inputs.max_submit }}
+          INPUT_VISIBILITY: ${{ inputs.visibility }}
+          INPUT_POLL_SECONDS: ${{ inputs.poll_seconds }}
         run: |
           # workflow_dispatch mengisi inputs.*; schedule tidak (kosong).
           # Default di sini harus sama dengan default workflow_dispatch.
@@ -83,14 +98,20 @@ jobs:
           SIZE="${INPUT_SIZE:-1}"
           SLEEP="${INPUT_SLEEP:-6}"
           SEED="${INPUT_SEED:-0}"
+          MAX_SUBMIT="${INPUT_MAX_SUBMIT:-3}"
+          VISIBILITY="${INPUT_VISIBILITY:-public}"
+          POLL_SECONDS="${INPUT_POLL_SECONDS:-45}"
 
-          echo "limit=$LIMIT size=$SIZE sleep=$SLEEP seed=$SEED"
+          echo "limit=$LIMIT size=$SIZE sleep=$SLEEP seed=$SEED max_submit=$MAX_SUBMIT visibility=$VISIBILITY"
           echo "api key: $([ -n "$URLSCAN_API_KEY" ] && echo tersedia || echo tidak ada)"
 
           # Input dari workflow_dispatch tetap harus numerik.
           case "$LIMIT" in ''|*[!0-9]*) echo "::error::limit tidak valid: $LIMIT" >&2; exit 2;; esac
           case "$SIZE"  in ''|*[!0-9]*) echo "::error::size tidak valid: $SIZE" >&2; exit 2;; esac
           case "$SLEEP" in ''|*[!0-9]*) echo "::error::sleep tidak valid: $SLEEP" >&2; exit 2;; esac
+          case "$MAX_SUBMIT" in ''|*[!0-9]*) echo "::error::max_submit tidak valid: $MAX_SUBMIT" >&2; exit 2;; esac
+          case "$POLL_SECONDS" in ''|*[!0-9]*) echo "::error::poll_seconds tidak valid: $POLL_SECONDS" >&2; exit 2;; esac
+          case "$VISIBILITY" in public|unlisted|private) ;; *) echo "::error::visibility tidak valid: $VISIBILITY" >&2; exit 2;; esac
 
           if [ -n "$URLSCAN_API_KEY" ]; then
             export PROBE_API_KEY="$URLSCAN_API_KEY"
@@ -98,12 +119,21 @@ jobs:
 
           # --merge-out menggabungkan hasil run ini ke ledger yang sudah ada,
           # bukan menimpanya: bukti yang pernah ditemukan tetap tersimpan.
+          #
+          # --submit-scan MEMINTA urlscan.io memindai domain yang belum punya
+          # scan sama sekali. Kuota scan per menit terbatas, jadi jumlahnya
+          # dibatasi --max-submit, dan domain yang sudah pernah kita scan
+          # dilewati supaya kuota tidak terbuang untuk domain yang sama.
           python probe.py \
             --domains domain.txt \
             --limit "$LIMIT" \
             --size "$SIZE" \
             --sleep "$SLEEP" \
             --seed "$SEED" \
+            --submit-scan \
+            --max-submit "$MAX_SUBMIT" \
+            --visibility "$VISIBILITY" \
+            --poll-seconds "$POLL_SECONDS" \
             --json-out probe-result.json \
             --merge-out urlscan-evidence.json
 
