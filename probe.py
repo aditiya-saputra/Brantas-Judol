@@ -32,9 +32,11 @@ situs judol.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import random
+import re
 import sys
 import time
 from typing import Optional
@@ -49,6 +51,7 @@ SEARCH_URL = "https://urlscan.io/api/v1/search/"
 # Butuh API key dengan scope write.
 SCAN_URL = "https://urlscan.io/api/v1/scan/"
 RESULT_URL = "https://urlscan.io/api/v1/result/{uuid}/"
+DOM_URL = "https://urlscan.io/dom/{uuid}/"
 QUOTAS_URL = "https://urlscan.io/api/v1/quotas"
 
 # Kuota urlscan tidak dipublikasikan. Default dibuat kecil dan jarak antar
@@ -68,6 +71,7 @@ DEFAULT_SCAN_URL_TEMPLATE = "https://{domain}"
 # menyentuh ratusan host (iklan, tracker, CDN); cukup daftar pendek supaya
 # ledger tetap ringan.
 MAX_CONTACTED = 15
+MAX_DOM_CHARS = 1500
 
 RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 
@@ -322,6 +326,33 @@ def poll_result(
     return None
 
 
+def extract_dom_text(raw_html: str, max_chars: int = MAX_DOM_CHARS) -> str:
+    """Bersihkan HTML DOM dari urlscan menjadi teks bersih tanpa script/style.
+
+    Teks ini dipangkas dan di-escape untuk aman dipakai sebagai bukti tekstual
+    tanpa menghabiskan token LLM atau mengeksekusi script.
+    """
+    if not raw_html or not isinstance(raw_html, str):
+        return ""
+    cleaned = re.sub(r"(?is)<(script|style|noscript|svg)[^>]*>.*?</\1>", " ", raw_html)
+    cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+    cleaned = html.unescape(cleaned)
+    return " ".join(cleaned.split())[:max_chars]
+
+
+def fetch_dom_snippet(client: httpx.Client, uuid: str) -> str:
+    """Ambil ringkasan teks DOM dari urlscan.io untuk scan yang sudah selesai."""
+    if not uuid:
+        return ""
+    try:
+        resp = client.get(DOM_URL.format(uuid=uuid))
+        if resp.status_code == 200 and resp.text:
+            return extract_dom_text(resp.text)
+    except httpx.HTTPError:
+        pass
+    return ""
+
+
 def summarize_scan(payload: dict) -> dict:
     """Ambil metadata yang aman dari hasil scan.
 
@@ -406,6 +437,7 @@ SCAN_EVIDENCE_FIELDS = (
     "scan_http_status",
     "scan_screenshot",
     "scan_contacted",
+    "scan_dom_snippet",
     "scan_malicious",
     "scan_score",
     "scan_scanned_at",
@@ -789,8 +821,13 @@ def main(argv: Optional[list[str]] = None) -> int:
                             row.update(summarize_scan(payload))
                             row["scan_uuid"] = uuid
                             row.pop("scan_pending_uuid", None)
+                            dom_text = fetch_dom_snippet(client, uuid)
+                            if dom_text:
+                                row["scan_dom_snippet"] = dom_text
                             existing[domain]["scan_uuid"] = uuid
                             existing[domain].pop("scan_pending_uuid", None)
+                            if dom_text:
+                                existing[domain]["scan_dom_snippet"] = dom_text
                             detail = row.get("scan_title") or row.get("scan_page_url") or "(tanpa judul)"
                             print(f"  [{index}/{len(sample)}] {domain}: scan selesai -> {detail}")
                         else:

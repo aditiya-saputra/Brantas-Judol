@@ -120,15 +120,59 @@ class ClassifyError(RuntimeError):
     pass
 
 
+class Evidence(list):
+    """List of urlscan result URLs with attached DOM metadata from urlscan."""
+
+    def __init__(
+        self,
+        links: Optional[list[str]] = None,
+        title: str = "",
+        page_url: str = "",
+        contacted: Optional[list[str]] = None,
+        dom_snippet: str = "",
+        score: Optional[int] = None,
+        http_status: Optional[int] = None,
+    ):
+        super().__init__(links or [])
+        self.title = title
+        self.page_url = page_url
+        self.contacted = contacted or []
+        self.dom_snippet = dom_snippet
+        self.score = score
+        self.http_status = http_status
+
+
 def build_prompt(domain: str, links: list[str]) -> str:
+    parts: list[str] = []
     if links:
-        evidence = "\n".join(f"- {url}" for url in links)
-        body = f"Bukti: {len(links)} URL hasil pemindaian yang menyebut domain ini.\n{evidence}"
+        urls = "\n".join(f"- {url}" for url in links)
+        parts.append(f"Bukti: {len(links)} URL hasil pemindaian yang menyebut domain ini.\n{urls}")
     else:
-        body = (
+        parts.append(
             "Bukti: TIDAK ADA scan urlscan.io yang menyebut domain ini. "
             "Nilai hanya dari nama domainnya, dan turunkan keyakinan."
         )
+
+    # Tambahkan data DOM dan metadata langsung dari scan urlscan (jika ada).
+    title = getattr(links, "title", "")
+    page_url = getattr(links, "page_url", "")
+    contacted = getattr(links, "contacted", [])
+    dom_snippet = getattr(links, "dom_snippet", "")
+
+    meta_parts: list[str] = []
+    if title:
+        meta_parts.append(f"Judul halaman: {title}")
+    if page_url:
+        meta_parts.append(f"URL halaman akhir: {page_url}")
+    if contacted:
+        meta_parts.append(f"Host yang dihubungi: {', '.join(contacted[:10])}")
+    if dom_snippet:
+        meta_parts.append(f"Teks isi halaman (DOM snapshot):\n\"\"\"\n{dom_snippet}\n\"\"\"")
+
+    if meta_parts:
+        parts.append("Metadata & Data Langsung dari Hasil Scan urlscan.io:\n" + "\n".join(meta_parts))
+
+    body = "\n\n".join(parts)
     return (
         f"Kandidat domain: {domain}\n\n"
         f"{body}\n\n"
@@ -185,9 +229,18 @@ def load_evidence(path: str, links: int = DEFAULT_LINKS) -> dict[str, list[str]]
         uuids = item.get("uuids") or (
             [item.get("first_uuid")] if item.get("first_uuid") else []
         )
-        evidence[domain] = [
+        links_list = [
             f"https://urlscan.io/result/{uid}/" for uid in uuids if uid
         ][:links]
+        evidence[domain] = Evidence(
+            links=links_list,
+            title=str(item.get("scan_title") or ""),
+            page_url=str(item.get("scan_page_url") or ""),
+            contacted=item.get("scan_contacted") or [],
+            dom_snippet=str(item.get("scan_dom_snippet") or ""),
+            score=item.get("scan_score"),
+            http_status=item.get("scan_http_status"),
+        )
     return evidence
 
 
@@ -197,19 +250,26 @@ def classify(
     links: list[str],
     model: str,
     retries: int = 3,
+    grounding: bool = False,
 ) -> dict:
-    """Kirim satu domain ke Gemini. Kembalikan {'score', 'reason', 'evidence'}."""
-    body = {
+    """Kirim satu domain ke Gemini. Kembalikan {'score', 'reason', 'evidence'}.
+
+    Jika grounding=True, alat pencarian Google Search dipakai (memerlukan kuota
+    grounding di Gemini). Default False untuk mengandalkan data DOM/metadata
+    langsung dari urlscan dan menghindari limit kuota 429.
+    """
+    body: dict = {
         "model": model,
         "system_instruction": SYSTEM_INSTRUCTION,
         "input": build_prompt(domain, links),
-        "tools": [{"type": "google_search"}],
         "response_format": {
             "type": "text",
             "mime_type": "application/json",
             "schema": RESPONSE_SCHEMA,
         },
     }
+    if grounding:
+        body["tools"] = [{"type": "google_search"}]
     headers = {
         "Content-Type": "application/json",
         "Api-Revision": API_REVISION,
@@ -332,6 +392,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--evidence",
         help="hasil probe.py (JSON) yang berisi domain + uuids sebagai bukti",
     )
+    parser.add_argument(
+        "--google-search",
+        action="store_true",
+        help="gunakan Google Search grounding tool di Gemini (butuh kuota grounding)",
+    )
     parser.add_argument("--json-out", help="simpan hasil lengkap sebagai JSON")
     return parser
 
@@ -402,7 +467,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             links = evidence.get(domain, [])
 
             try:
-                row = classify(gemini, domain, links, args.model)
+                row = classify(gemini, domain, links, args.model, grounding=args.google_search)
             except ClassifyError as exc:
                 failures += 1
                 print(f"  [{index}/{len(sample)}] {domain}: gemini: {exc}", file=sys.stderr)

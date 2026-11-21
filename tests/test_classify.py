@@ -52,6 +52,21 @@ def test_prompt_carries_evidence_links():
     assert "1 URL" in prompt
 
 
+def test_prompt_carries_dom_snippet_and_metadata():
+    ev = classify.Evidence(
+        links=["https://urlscan.io/result/u1/"],
+        title="SLOT GACOR",
+        page_url="https://x.com/landing",
+        contacted=["cdn.x.com"],
+        dom_snippet="Daftar situs slot gacor jackpot maxwin",
+    )
+    prompt = classify.build_prompt("x.com", ev)
+    assert "SLOT GACOR" in prompt
+    assert "https://x.com/landing" in prompt
+    assert "cdn.x.com" in prompt
+    assert "Daftar situs slot gacor jackpot maxwin" in prompt
+
+
 def test_prompt_without_evidence_asks_for_lower_confidence():
     prompt = classify.build_prompt("x.com", [])
     assert "TIDAK ADA" in prompt
@@ -129,7 +144,7 @@ def test_classify_parses_schema_json(monkeypatch):
     assert row["evidence"] == ["a.com"]
 
 
-def test_classify_sends_grounding_tool_and_revision_header(monkeypatch):
+def test_classify_sends_grounding_tool_when_requested(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "k")
     monkeypatch.setattr(classify.time, "sleep", lambda _s: None)
     seen = {}
@@ -142,7 +157,7 @@ def test_classify_sends_grounding_tool_and_revision_header(monkeypatch):
         return gemini_response(json.dumps({"gambling_probability": 5, "reason": "no"}))
 
     with make_client(handler) as client:
-        classify.classify(client, "a.com", [], "gemini-3.8-flash")
+        classify.classify(client, "a.com", [], "gemini-3.8-flash", grounding=True)
 
     assert seen["url"].startswith("https://generativelanguage.googleapis.com/v1beta/interactions")
     assert seen["revision"] == classify.API_REVISION
@@ -150,6 +165,21 @@ def test_classify_sends_grounding_tool_and_revision_header(monkeypatch):
     assert seen["body"]["tools"] == [{"type": "google_search"}]
     assert seen["body"]["model"] == "gemini-3.8-flash"
     assert seen["body"]["response_format"]["mime_type"] == "application/json"
+
+
+def test_classify_omits_tools_by_default(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    monkeypatch.setattr(classify.time, "sleep", lambda _s: None)
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["body"] = json.loads(request.content)
+        return gemini_response(json.dumps({"gambling_probability": 5, "reason": "no"}))
+
+    with make_client(handler) as client:
+        classify.classify(client, "a.com", [], "gemini-3.8-flash")
+
+    assert "tools" not in seen["body"]
 
 
 def test_classify_requires_api_key(monkeypatch):

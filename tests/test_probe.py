@@ -537,6 +537,14 @@ def test_summarize_scan_never_keeps_dom_content(monkeypatch):
     assert "cookies" not in summary
 
 
+def test_extract_dom_text_cleans_tags_and_scripts():
+    raw_html = "<html><head><script>alert(1)</script><style>b{color:red}</style></head><body><h1>Judol</h1></body></html>"
+    cleaned = probe.extract_dom_text(raw_html)
+    assert cleaned == "Judol"
+    assert "alert" not in cleaned
+    assert "color:red" not in cleaned
+
+
 def test_merge_evidence_keeps_scan_fields():
     old = {"a.com": {"total": 0, "uuids": [], "first_url": "", "first_scanned": "",
                      "checked_at": 1, "scan_uuid": "u-old", "scan_status": "done",
