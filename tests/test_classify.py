@@ -137,7 +137,7 @@ def test_classify_parses_schema_json(monkeypatch):
         )
 
     with make_client(handler) as client:
-        row = classify.classify(client, "a.com", [], "gemini-3.8-flash")
+        row = classify.classify(client, "a.com", [], "gemini-3.5-flash-lite")
 
     assert row["score"] == 91
     assert row["reason"] == "slot gacor"
@@ -157,13 +157,13 @@ def test_classify_sends_grounding_tool_when_requested(monkeypatch):
         return gemini_response(json.dumps({"gambling_probability": 5, "reason": "no"}))
 
     with make_client(handler) as client:
-        classify.classify(client, "a.com", [], "gemini-3.8-flash", grounding=True)
+        classify.classify(client, "a.com", [], "gemini-3.5-flash-lite", grounding=True)
 
     assert seen["url"].startswith("https://generativelanguage.googleapis.com/v1beta/interactions")
     assert seen["revision"] == classify.API_REVISION
     assert seen["key"] == "k"
     assert seen["body"]["tools"] == [{"type": "google_search"}]
-    assert seen["body"]["model"] == "gemini-3.8-flash"
+    assert seen["body"]["model"] == "gemini-3.5-flash-lite"
     assert seen["body"]["response_format"]["mime_type"] == "application/json"
 
 
@@ -177,7 +177,7 @@ def test_classify_omits_tools_by_default(monkeypatch):
         return gemini_response(json.dumps({"gambling_probability": 5, "reason": "no"}))
 
     with make_client(handler) as client:
-        classify.classify(client, "a.com", [], "gemini-3.8-flash")
+        classify.classify(client, "a.com", [], "gemini-3.5-flash-lite")
 
     assert "tools" not in seen["body"]
 

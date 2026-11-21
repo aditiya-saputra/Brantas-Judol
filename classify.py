@@ -61,7 +61,7 @@ USER_AGENT = f"brantas-judol-classify/{VERSION} (+mailto:aditiya.saputrax1x2@gma
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 # Wajib menurut dokumentasi Interactions API per 2026-05-20.
 API_REVISION = "2026-05-20"
-DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
 DEFAULT_BLOCK_THRESHOLD = 80
 DEFAULT_ALLOW_THRESHOLD = 20
