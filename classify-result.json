@@ -37,9 +37,11 @@
   },
   {
     "domain": "projects.v843.casino",
-    "score": 50,
-    "reason": "Domain menggunakan ekstensi .casino tetapi halaman mengembalikan error 502, bukti kurang untuk konfirmasi penuh.",
-    "evidence": [],
+    "score": 85,
+    "reason": "Menggunakan TLD .casino yang umumnya diasosiasikan dengan perjudian online, meskipun halaman saat ini menampilkan error 502.",
+    "evidence": [
+      "projects.v843.casino"
+    ],
     "links": []
   },
   {
@@ -80,9 +82,11 @@
   },
   {
     "domain": "mail.riobetcasino-352.top",
-    "score": 50,
-    "reason": "Domain berisi error 502 tanpa konten aktif, tetapi indikasi nama menunjukkan merek kasino. Masuk zona abu-abu.",
-    "evidence": [],
+    "score": 60,
+    "reason": "Domain memiliki indikasi nama merek kasino, namun halaman mengembalikan Error 502 tanpa bukti isi yang aktif.",
+    "evidence": [
+      "mail.riobetcasino-352.top"
+    ],
     "links": []
   },
   {
@@ -111,7 +115,7 @@
   {
     "domain": "de.riobetcasino-tle.top",
     "score": 50,
-    "reason": "Tidak ada bukti konten nyata yang tersedia, masuk dalam zona abu-abu untuk review manual.",
+    "reason": "Tidak ada bukti konten nyata yang tersedia, nama domain mencurigakan (riobetcasino). Masuk zona abu-abu untuk review manual.",
     "evidence": [],
     "links": []
   },
@@ -204,8 +208,179 @@
   {
     "domain": "casino1550.cfd",
     "score": 50,
-    "reason": "Domain memiliki indikasi kata kunci casino namun hanya mengembalikan error 403 Cloudflare, bukti kurang untuk konfirmasi mutlak.",
+    "reason": "Domain name contains casino but page returned 403 Forbidden. Insufficient concrete evidence to confirm gambling.",
     "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "rtptiannew.com",
+    "score": 0,
+    "reason": "Domain is parked for free by GoDaddy with no gambling content present.",
+    "evidence": [],
+    "links": [
+      "https://urlscan.io/result/019cff49-e8f9-737d-99a5-bae956035611/"
+    ]
+  },
+  {
+    "domain": "database.1xslotscasino09k.ru",
+    "score": 85,
+    "reason": "Nama domain mengandung kata kunci kasino (1xslotscasino09k) yang merupakan ciri khas situs judi online, meskipun halaman mengembalikan error 403.",
+    "evidence": [
+      "database.1xslotscasino09k.ru"
+    ],
+    "links": []
+  },
+  {
+    "domain": "slot-5000.cap.attractmode.org",
+    "score": 30,
+    "reason": "Meskipun ada kata slot pada nama domain, isi halaman saat ini mengembalikan error 404 GitHub Pages dan tidak aktif.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "console.yard-free-casino.ru",
+    "score": 85,
+    "reason": "Nama domain mengandung kata kunci free-casino, mengindikasikan situs kasino online.",
+    "evidence": [
+      "console.yard-free-casino.ru"
+    ],
+    "links": []
+  },
+  {
+    "domain": "www.superslot4506.ph",
+    "score": 50,
+    "reason": "Domain parkir, tidak ada bukti aktivitas judi nyata. Masuk zona abu-abu.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "www.casinorealmoney.ph",
+    "score": 30,
+    "reason": "Domain memiliki indikasi terkait kasino dari namanya, tetapi isi halaman hanya menunjukkan halaman parkir (ParkLogic), bukan situs judi aktif.",
+    "evidence": [],
+    "links": [
+      "https://urlscan.io/result/01a042a6-cc22-746c-a4c4-951215e8fe76/"
+    ]
+  },
+  {
+    "domain": "edu.vodkatopcasino.ru",
+    "score": 85,
+    "reason": "Nama domain mengandung kata 'vodkatopcasino', sangat mengindikasikan situs kasino/judi meskipun saat ini mengembalikan error 404.",
+    "evidence": [
+      "edu.vodkatopcasino.ru"
+    ],
+    "links": []
+  },
+  {
+    "domain": "gesloten.pensioenbijconnectionsystems.nl",
+    "score": 50,
+    "reason": "Tidak ada bukti konten teks yang tersedia, sehingga dimasukkan ke zona abu-abu untuk review manual.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "game4dslot-neww.pages.dev",
+    "score": 95,
+    "reason": "Halaman secara eksplisit mempromosikan SLOT4D, slot gacor, dan jackpot yang merupakan indikator kuat judi online.",
+    "evidence": [
+      "game4dslot-neww.pages.dev"
+    ],
+    "links": []
+  },
+  {
+    "domain": "gclubcasino716.ph",
+    "score": 50,
+    "reason": "Domain parkir, tidak ada bukti langsung aktivitas judol. Masuk zona abu-abu.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "www.minmaxwine.com",
+    "score": 0,
+    "reason": "Domain sudah expired dan saat ini menampilkan halaman parkir/expired standar dari penyedia domain.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "snatch-casino-nz18.site",
+    "score": 50,
+    "reason": "Tidak ada bukti konten halaman yang tersedia, namun pola nama domain mencurigakan. Masuk zona abu-abu.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "casinonearme.ai",
+    "score": 50,
+    "reason": "Tidak ada bukti konten nyata yang tersedia, masuk zona abu-abu untuk review manual.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "www.lajudicialcollege.com",
+    "score": 50,
+    "reason": "Tidak ada bukti konten nyata atau cuplikan teks yang tersedia untuk domain ini.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "stakescasinoonline.de",
+    "score": 85,
+    "reason": "Situs terbukti menyediakan konten perjudian online berdasarkan judul 'Online Sportwetten und Glücksspiel' dan menu kasino.",
+    "evidence": [
+      "stakescasinoonline.de"
+    ],
+    "links": []
+  },
+  {
+    "domain": "allrightcasino38.club",
+    "score": 90,
+    "reason": "Situs secara jelas memuat konten kasino online dan slot berlisensi berdasarkan teks DOM.",
+    "evidence": [
+      "allrightcasino38.club"
+    ],
+    "links": []
+  },
+  {
+    "domain": "casino3706.cfd",
+    "score": 85,
+    "reason": "Nama domain menggunakan kata kunci 'casino' yang berindikasi kuat sebagai situs judi online, meskipun halaman menampilkan blokir Cloudflare.",
+    "evidence": [
+      "casino3706.cfd"
+    ],
+    "links": []
+  },
+  {
+    "domain": "casinoderoyal.com",
+    "score": 50,
+    "reason": "Tidak ada bukti konten nyata atau cuplikan teks yang tersedia untuk kandidat domain ini.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "sentry.instant-casino-ufficiali.click",
+    "score": 85,
+    "reason": "Nama domain mengandung 'instant-casino' yang mengindikasikan promosi kasino online.",
+    "evidence": [
+      "sentry.instant-casino-ufficiali.click"
+    ],
+    "links": []
+  },
+  {
+    "domain": "ev999casinobet.com",
+    "score": 100,
+    "reason": "Situs memuat penawaran bonus deposit, slot game, casino, tembak ikan, dan cá cược.",
+    "evidence": [
+      "ev999casinobet.com"
+    ],
+    "links": []
+  },
+  {
+    "domain": "panel.fugu-casino69.casino",
+    "score": 85,
+    "reason": "Nama domain mengandung kata kunci 'casino69' yang merupakan pola umum situs perjudian online, meskipun halaman mengembalikan error 502.",
+    "evidence": [
+      "panel.fugu-casino69.casino"
+    ],
     "links": []
   }
 ]
