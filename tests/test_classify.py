@@ -70,7 +70,7 @@ def test_prompt_carries_dom_snippet_and_metadata():
 def test_prompt_without_evidence_asks_for_lower_confidence():
     prompt = classify.build_prompt("x.com", [])
     assert "TIDAK ADA" in prompt
-    assert "turunkan keyakinan" in prompt
+    assert "zona review/abu-abu" in prompt
 
 
 def test_system_instruction_blocks_prompt_injection():
