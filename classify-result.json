@@ -1,8 +1,8 @@
 [
   {
     "domain": "maxwinm.com",
-    "score": 100,
-    "reason": "Teks situs secara eksplisit menyebutkan istilah slot, live casino, dan bonus harian yang merupakan indikator kuat judi online.",
+    "score": 95,
+    "reason": "Teks situs secara eksplisit menyebutkan istilah slot, live casino, dan game online untuk gamer Indonesia, yang merupakan indikator kuat judi online.",
     "evidence": [
       "maxwinm.com"
     ],
@@ -29,7 +29,7 @@
   {
     "domain": "goldruncasinoonline.nl",
     "score": 0,
-    "reason": "Situs kasino online berlisensi resmi di Belanda (KSA) yang menargetkan pasar perjudian Belanda, bukan Indonesia.",
+    "reason": "Situs kasino online berlisensi resmi di Belanda (KSA) yang berfokus pada pasar Eropa/Belanda, bukan target judol Indonesia.",
     "evidence": [],
     "links": [
       "https://urlscan.io/result/01a096ff-b16f-74dc-9c54-0cdfcb0f113f/"
@@ -122,7 +122,7 @@
   {
     "domain": "jogosdecasinosonline.com",
     "score": 50,
-    "reason": "Bukti kurang, halaman menampilkan blokir wilayah, masuk zona abu-abu untuk review.",
+    "reason": "Domain memiliki indikasi terkait kasino online dari namanya, namun bukti teks isi halaman tidak lengkap (hanya menampilkan blokir wilayah), sehingga masuk zona abu-abu.",
     "evidence": [],
     "links": []
   },
@@ -214,8 +214,8 @@
   },
   {
     "domain": "rtptiannew.com",
-    "score": 0,
-    "reason": "Domain is parked for free by GoDaddy with no gambling content present.",
+    "score": 30,
+    "reason": "Domain parkir GoDaddy meskipun mengandung kata rtp. Belum ada bukti operasional judol.",
     "evidence": [],
     "links": [
       "https://urlscan.io/result/019cff49-e8f9-737d-99a5-bae956035611/"
@@ -380,6 +380,179 @@
     "reason": "Nama domain mengandung kata kunci 'casino69' yang merupakan pola umum situs perjudian online, meskipun halaman mengembalikan error 502.",
     "evidence": [
       "panel.fugu-casino69.casino"
+    ],
+    "links": []
+  },
+  {
+    "domain": "casino3012.buzz",
+    "score": 50,
+    "reason": "Nama domain mengandung kata kunci kasino, tetapi bukti isi hanya menampilkan halaman blokir 403 Cloudflare tanpa konten aktif.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "gitlab.riobetcasino-352.top",
+    "score": 90,
+    "reason": "Situs memuat konten promosi kasino online dan mesin slot (Riobet casino).",
+    "evidence": [
+      "gitlab.riobetcasino-352.top"
+    ],
+    "links": []
+  },
+  {
+    "domain": "beta.casino926.fun",
+    "score": 85,
+    "reason": "Teks isi halaman menyebutkan 'Cat casino', '18+', dan 'Играйте ответственно' yang menunjukkan situs kasino dan perjudian.",
+    "evidence": [
+      "beta.casino926.fun"
+    ],
+    "links": []
+  },
+  {
+    "domain": "www.casinonightrentals.co.ke",
+    "score": 0,
+    "reason": "Situs penyedia sewa meja kasino untuk pesta dan acara korporat di Kenya, bukan situs judi online Indonesia.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "marvelcasinos.es",
+    "score": 90,
+    "reason": "Situs menampilkan promosi kasino online, bonus deposit, dan katalog permainan slot dari berbagai provider.",
+    "evidence": [
+      "marvelcasinos.es"
+    ],
+    "links": []
+  },
+  {
+    "domain": "login.jaldijackpot.com",
+    "score": 50,
+    "reason": "Domain memiliki kata kunci 'jackpot' namun halaman mengembalikan error 404 Not Found. Bukti kurang untuk konfirmasi penuh.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "casino-vavada24.ru",
+    "score": 85,
+    "reason": "Nama domain dan URL pengalihan (casino-vavada26.top) mengindikasikan merek kasino online terkenal.",
+    "evidence": [
+      "casino-vavada24.ru"
+    ],
+    "links": [
+      "https://urlscan.io/result/01a20012-6275-73f9-9618-f6cf01ee518a/"
+    ]
+  },
+  {
+    "domain": "rabbitmq.pokerdom-casino-4bc.top",
+    "score": 85,
+    "reason": "Nama domain mengandung kata pokerdom dan casino yang merupakan indikator kuat situs perjudian.",
+    "evidence": [
+      "rabbitmq.pokerdom-casino-4bc.top"
+    ],
+    "links": []
+  },
+  {
+    "domain": "casino073.lol",
+    "score": 50,
+    "reason": "Domain memiliki kata kunci 'casino' tetapi bukti isi halaman hanya menunjukkan error 403 Cloudflare. Masuk zona abu-abu karena kurang bukti nyata.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "ffq-ui-rtp-pet.herokuapp.com",
+    "score": 50,
+    "reason": "Tidak ada bukti konten nyata, skor berada di zona abu-abu untuk review manual.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "nouveau-casino-en-ligne-france.net",
+    "score": 50,
+    "reason": "Tidak ada bukti konten nyata atau cuplikan teks yang tersedia. Masuk dalam zona abu-abu untuk review manual.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "pein01mstrt251binte-slot.dxcloud.episerver.net",
+    "score": 75,
+    "reason": "Domain mengandung pola nama mencurigakan (slot) meski halaman saat ini error 403 stopped.",
+    "evidence": [
+      "pein01mstrt251binte-slot.dxcloud.episerver.net"
+    ],
+    "links": [
+      "https://urlscan.io/result/019f08c9-33e2-742c-884e-e7fcf398e65d/"
+    ]
+  },
+  {
+    "domain": "db.8203.casino",
+    "score": 50,
+    "reason": "Domain menggunakan ekstensi casino tetapi hanya mengembalikan Error 502 Bad Gateway. Bukti tidak cukup untuk konfirmasi.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "casino7019.cfd",
+    "score": 60,
+    "reason": "Nama domain mengandung kata 'casino' tetapi bukti isi hanya menampilkan halaman blokir 403 Cloudflare, masuk zona abu-abu.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "keycloak.6805.casino",
+    "score": 85,
+    "reason": "Menggunakan TLD .casino yang umumnya diasosiasikan dengan perjudian online.",
+    "evidence": [
+      "keycloak.6805.casino"
+    ],
+    "links": []
+  },
+  {
+    "domain": "betzillocasino.ink",
+    "score": 90,
+    "reason": "Situs menunjukkan promosi kasino online dan taruhan olahraga seperti slot, live dealer, dan bonus deposit.",
+    "evidence": [
+      "betzillocasino.ink"
+    ],
+    "links": [
+      "https://urlscan.io/result/01a18aaa-1c42-708c-9edf-70a86122806b/"
+    ]
+  },
+  {
+    "domain": "stardacasino-mymytyshy3.ru",
+    "score": 50,
+    "reason": "Tidak ada bukti konten nyata atau cuplikan teks yang tersedia untuk domain ini.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "www.22bitcasino.co.cz",
+    "score": 0,
+    "reason": "Situs ini adalah kasino online berlisensi Curacao yang menargetkan pemain dari Republik Ceko (bahasa Ceko), bukan Indonesia.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "casino6297.buzz",
+    "score": 60,
+    "reason": "Domain name contains casino keywords, but the site returns a Cloudflare 403 error with no concrete gambling content.",
+    "evidence": [
+      "casino6297.buzz"
+    ],
+    "links": []
+  },
+  {
+    "domain": "slotsfunnels.info",
+    "score": 0,
+    "reason": "Domain ini melakukan redirect ke konverrt.com dan berisi layanan B2B untuk M&A advisors serta PE firms.",
+    "evidence": [],
+    "links": []
+  },
+  {
+    "domain": "www.nexus.freshcasino-ad412.top",
+    "score": 85,
+    "reason": "Nama domain menggunakan pola khas kasino online dan redirect mencurigakan, terindikasi kuat sebagai situs judol.",
+    "evidence": [
+      "www.nexus.freshcasino-ad412.top"
     ],
     "links": []
   }
