@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1795376323,
+  "generated_at": 1795419383,
   "domains": [
+    {
+      "domain": "ak999slot.win",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
     {
       "domain": "akses-togelasia888com.pages.dev",
       "total": 0,
@@ -108,6 +117,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "bestonlinecasinos-uk-one-112319-7yj.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "bet-mgmcasino.com",
       "total": 0,
       "uuids": [],
@@ -198,6 +216,24 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino-piperspin.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
+      "domain": "casino-rabona-net.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "casino-rubin-online.pro",
@@ -411,6 +447,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "customers.casino3496.buzz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "daddy-casino.wtf",
       "total": 0,
       "uuids": [],
@@ -515,6 +560,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "download.slots-bett-1xbet.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "dreamcasino.it",
       "total": 0,
       "uuids": [],
@@ -567,6 +621,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581468
+    },
+    {
+      "domain": "edu.eldorado-casino-fdp.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "edu.vodkatopcasino.ru",
@@ -713,6 +776,17 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "fishin-frenzy-free-slot.uk",
+      "total": 1,
+      "uuids": [
+        "019d8f17-32f2-7133-a102-0f9c153961c8"
+      ],
+      "first_uuid": "019d8f17-32f2-7133-a102-0f9c153961c8",
+      "first_url": "https://fishin-frenzy-free-slot.uk/",
+      "first_scanned": "2026-04-15T03:02:42.759Z",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "fly88casino.casino",
       "total": 0,
       "uuids": [],
@@ -803,6 +877,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581749
+    },
+    {
+      "domain": "get.vavada-casino-ref.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "git.casino381.buzz",
@@ -917,6 +1000,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "jackpotpn.ph",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "januszcasinopolska.com",
       "total": 1,
       "uuids": [
@@ -989,6 +1081,28 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794833499
+    },
+    {
+      "domain": "kingmakercasino.io",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383,
+      "scan_uuid": "01a20752-560d-7635-92c4-5a5f39776dcd",
+      "scan_status": "done",
+      "scan_title": "kingmakercasino.io | 525: SSL handshake failed",
+      "scan_page_url": "https://kingmakercasino.io/",
+      "scan_http_status": 525,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a20752-560d-7635-92c4-5a5f39776dcd.png",
+      "scan_contacted": [
+        "kingmakercasino.io"
+      ],
+      "scan_dom_snippet": "kingmakercasino.io | 525: SSL handshake failed SSL handshake failed Error code 525 Visit cloudflare.com for more information. 2026-11-23 07:32:46 UTC You Browser Working Stockholm Cloudflare Working kingmakercasino.io Host Error What happened? The SSL/TLS handshake between Cloudflare and the origin web server failed. What can I do? If you're a visitor of this website: Please try again in a few minutes. If you're the owner of this website: Please refer to the Error 525 article: Verify a valid SSL certificate is installed on your origin server. If none exists, install a free Cloudflare Origin CA certificate . Check Origin Analytics . Ensure port 443 is open and your origin supports SNI. Review your server's cipher suites for compatibility with Cloudflare. Cloudflare Ray ID: a5ee7b5ea96d40ff • Your IP: Click to reveal 79.142.77.207 • Performance & security by Cloudflare",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795419182
     },
     {
       "domain": "kometa-casino-amp-42.top",
@@ -1101,6 +1215,17 @@
       "checked_at": 1795007392
     },
     {
+      "domain": "livescorebetcasino.me.uk",
+      "total": 1,
+      "uuids": [
+        "01a1dbfa-909b-7209-94ce-86617703b95e"
+      ],
+      "first_uuid": "01a1dbfa-909b-7209-94ce-86617703b95e",
+      "first_url": "https://livescorebetcasino.me.uk/",
+      "first_scanned": "2026-11-14T21:33:20.773Z",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "login.2513.casino",
       "total": 0,
       "uuids": [],
@@ -1184,6 +1309,28 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794744140
+    },
+    {
+      "domain": "macanslota138.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383,
+      "scan_uuid": "01a20753-0717-71c2-98f3-03151d8d2642",
+      "scan_status": "done",
+      "scan_title": "Attention Required! | Cloudflare",
+      "scan_page_url": "https://macanslota138.com/",
+      "scan_http_status": 403,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a20753-0717-71c2-98f3-03151d8d2642.png",
+      "scan_contacted": [
+        "macanslota138.com"
+      ],
+      "scan_dom_snippet": "Attention Required! | Cloudflare Please enable cookies. Sorry, you have been blocked You are unable to access macanslota138.com Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data. What can I do to resolve this? You can email the site owner to let them know you were blocked. Please include what you were doing when this page came up and the Cloudflare Ray ID found at the bottom of this page. Cloudflare Ray ID: a5ee7c78cc56d368 • Your IP: Click to reveal 169.150.211.155 • Performance & security by Cloudflare",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795419238
     },
     {
       "domain": "mahjongawslot777.site",
@@ -1391,6 +1538,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "newnongstopcasinos.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "ninatogel1.com.dominobet.pw",
       "total": 0,
       "uuids": [],
@@ -1416,6 +1572,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795288627
+    },
+    {
+      "domain": "np-rtp-201-ext-rp-vip.cisco.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "nw33.gradeaonlinecasinos.com",
@@ -1508,6 +1673,17 @@
       "checked_at": 1795094157
     },
     {
+      "domain": "org.kkslottoto.com",
+      "total": 1,
+      "uuids": [
+        "019b95ee-e028-75ae-83a0-d0c10bef888e"
+      ],
+      "first_uuid": "019b95ee-e028-75ae-83a0-d0c10bef888e",
+      "first_url": "https://fungame999.org.kkslottoto.com/",
+      "first_scanned": "2026-01-07T00:50:26.222Z",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "ossslots.pages.dev",
       "total": 0,
       "uuids": [],
@@ -1542,6 +1718,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794833499
+    },
+    {
+      "domain": "panel.vavada-casino-y2.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "panen123casino.top",
@@ -1820,6 +2005,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "rtpcorong99max.click",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "rtpmega158.com",
       "total": 0,
       "uuids": [],
@@ -1892,6 +2086,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "slot-777-games.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "slot.au.feedmeapidev.com",
@@ -2074,6 +2277,26 @@
       "checked_at": 1794833499
     },
     {
+      "domain": "wiki.r7casino-spk.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
+      "domain": "winberry.casino",
+      "total": 1,
+      "uuids": [
+        "01a1cbc4-2ef1-72cf-9190-4c76d415d0ad"
+      ],
+      "first_uuid": "01a1cbc4-2ef1-72cf-9190-4c76d415d0ad",
+      "first_url": "https://winberry.casino/?clickid=3t6ml944unnm&cmp=489555&http_referrer=https%3A%2F%2Fkeldorr.net%2F&modal=register&prm=550450&tr_src=seo&tracking_link=http%3A%2F%2Fplay-winberry-one.com%2Fadws2ppe3u",
+      "first_scanned": "2026-11-11T18:00:05.471Z",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "wishocasino-casino.dk",
       "total": 1,
       "uuids": [
@@ -2223,6 +2446,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "www.casinononstop.se",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "www.casinorealmoney.ph",
       "total": 1,
       "uuids": [
@@ -2277,6 +2509,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795288627
+    },
+    {
+      "domain": "www.javtogel.pro",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
     },
     {
       "domain": "www.judithbrownmeyersphotography.com",
@@ -2405,6 +2646,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "www.slotdisney.biz.bclub99.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383
+    },
+    {
       "domain": "www.slotgame8673.ph",
       "total": 0,
       "uuids": [],
@@ -2475,6 +2725,28 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795288627
+    },
+    {
+      "domain": "www.usapokercasinos.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795419383,
+      "scan_uuid": "01a20751-beb5-725f-85da-753775ccd451",
+      "scan_status": "done",
+      "scan_title": "Application placeholder",
+      "scan_page_url": "https://www.usapokercasinos.com/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a20751-beb5-725f-85da-753775ccd451.png",
+      "scan_contacted": [
+        "www.usapokercasinos.com"
+      ],
+      "scan_dom_snippet": "Application placeholder This site is waiting for content Deploy your files when they’re ready to shine. www.usapokercasinos.com A cool project is on the way. If you see this page, your DNS and server setup has been completed correctly.",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795419143
     },
     {
       "domain": "www.webjudicial.com",
