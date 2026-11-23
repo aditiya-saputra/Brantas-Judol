@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1795419383,
+  "generated_at": 1795478097,
   "domains": [
+    {
+      "domain": "ajaibslotsntapz78.xyz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
     {
       "domain": "ak999slot.win",
       "total": 0,
@@ -117,6 +126,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "bestecasinoszondercruks.it.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "bestonlinecasinos-uk-one-112319-7yj.pages.dev",
       "total": 0,
       "uuids": [],
@@ -216,6 +234,26 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino-ohne-5sekunden-live.de",
+      "total": 1,
+      "uuids": [
+        "019ac89d-902b-7658-ba4d-2105724ee534"
+      ],
+      "first_uuid": "019ac89d-902b-7658-ba4d-2105724ee534",
+      "first_url": "https://casino-ohne-5sekunden-live.de/",
+      "first_scanned": "2025-11-28T03:59:25.169Z",
+      "checked_at": 1795478097
+    },
+    {
+      "domain": "casino-otzyvy.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "casino-piperspin.net",
@@ -447,6 +485,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "customer.1xcasino-56.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "customers.casino3496.buzz",
       "total": 0,
       "uuids": [],
@@ -560,6 +607,17 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "dogecoin-casino.uk",
+      "total": 1,
+      "uuids": [
+        "019d9fd4-71c9-77db-8850-849e913649e3"
+      ],
+      "first_uuid": "019d9fd4-71c9-77db-8850-849e913649e3",
+      "first_url": "https://dogecoin-casino.uk/",
+      "first_scanned": "2026-04-18T09:03:21.504Z",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "download.slots-bett-1xbet.ru",
       "total": 0,
       "uuids": [],
@@ -612,6 +670,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794581749
+    },
+    {
+      "domain": "edctoto-slotgacor.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "edge.daddycasino-bvq.top",
@@ -767,6 +834,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "files.casino8209.buzz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "finance.vavadacasino7sx.ru",
       "total": 0,
       "uuids": [],
@@ -859,6 +935,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "gclubcasino375.ph",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "gclubcasino716.ph",
@@ -1000,6 +1085,17 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "jackpot108main.online",
+      "total": 1,
+      "uuids": [
+        "019fc6b8-4035-767e-a656-7ec93b59277d"
+      ],
+      "first_uuid": "019fc6b8-4035-767e-a656-7ec93b59277d",
+      "first_url": "https://jackpot108main.online/mobile/home",
+      "first_scanned": "2026-08-03T08:23:18.516Z",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "jackpotpn.ph",
       "total": 0,
       "uuids": [],
@@ -1072,6 +1168,28 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "keycloak.1xslots-1ao3k.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097,
+      "scan_uuid": "01a20ad2-6f42-74ff-9b66-99fb29898c88",
+      "scan_status": "done",
+      "scan_title": "403 Forbidden",
+      "scan_page_url": "https://keycloak.1xslots-1ao3k.top/",
+      "scan_http_status": 403,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a20ad2-6f42-74ff-9b66-99fb29898c88.png",
+      "scan_contacted": [
+        "keycloak.1xslots-1ao3k.top"
+      ],
+      "scan_dom_snippet": "403 Forbidden Forbidden You don't have permission to access this resource. Apache/2.4.41 (Ubuntu) Server at keycloak.1xslots-1ao3k.top Port 80",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795477908
     },
     {
       "domain": "keycloak.6805.casino",
@@ -1204,6 +1322,15 @@
       "checked_at": 1795094157
     },
     {
+      "domain": "link5.rtpgo55.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "linkslot235.info",
       "total": 1,
       "uuids": [
@@ -1289,6 +1416,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "lxjudiotshyqadomxncwwhjrsipk.fis.sfo.test.prod.sadbirds.aws.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "m.nesinecasino-resmigiris.icu",
@@ -1538,6 +1674,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "needforslots.cyou",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "newnongstopcasinos.com",
       "total": 0,
       "uuids": [],
@@ -1554,6 +1699,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795376323
+    },
+    {
+      "domain": "no-kyc-casinos.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "nodered.vavada-cazinos-sloti.ru",
@@ -1646,6 +1800,15 @@
       "checked_at": 1795007392
     },
     {
+      "domain": "onlinecasinosma.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "only1.togelkds.com",
       "total": 0,
       "uuids": [],
@@ -1691,6 +1854,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "owncloud.7438.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "pachislot-lab.info",
@@ -1996,6 +2168,15 @@
       "checked_at": 1794833499
     },
     {
+      "domain": "rtp-bynder-images-gb-stg2-bell.cloudflare.app",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "rtp-storefront-ca-prd.cloudflare.app",
       "total": 0,
       "uuids": [],
@@ -2077,6 +2258,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795007392
+    },
+    {
+      "domain": "sitemap.rtpasialam.one",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "slot-5000.cap.attractmode.org",
@@ -2268,6 +2458,37 @@
       "checked_at": 1794922369
     },
     {
+      "domain": "webmail.casino6289.online",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
+      "domain": "webmail.supergacorslot.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097,
+      "scan_uuid": "01a20ad3-0760-7751-bb7a-881134b66b2c",
+      "scan_status": "done",
+      "scan_title": "Webmail Login",
+      "scan_page_url": "https://webmail.supergacorslot.com/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a20ad3-0760-7751-bb7a-881134b66b2c.png",
+      "scan_contacted": [
+        "webmail.supergacorslot.com"
+      ],
+      "scan_dom_snippet": "Webmail Login You have logged out. The system has detected that you are using Internet Explorer 11. cPanel & WHM no longer supports Internet Explorer 11. For more information, read the cPanel Blog . Please select a locale: X Close العربية čeština dansk Deutsch Ελληνικά English español español latinoamericano español de España suomi Filipino français עברית magyar Bahasa Indonesia italiano 日本語 한국어 Bahasa Melayu norsk bokmål Nederlands polski português português do Brasil română русский svenska ไทย Türkçe українська Tiếng Việt 中文 中文（台湾） Continue Email Address Password Log in Reset Password العربية čeština dansk Deutsch Ελληνικά English español español latinoamericano … Select a locale: English Copyright© 2026 cPanel, L.L.C. Privacy Policy",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795477953
+    },
+    {
       "domain": "wiki.3502.casino",
       "total": 0,
       "uuids": [],
@@ -2428,6 +2649,15 @@
       "checked_at": 1795179577
     },
     {
+      "domain": "www.bolatogel88.id",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "www.casinofranceenligne.eu",
       "total": 0,
       "uuids": [],
@@ -2491,6 +2721,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795007392
+    },
+    {
+      "domain": "www.gacordewa66.store",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
     },
     {
       "domain": "www.gaspol188slot.com",
@@ -2619,6 +2858,15 @@
       "checked_at": 1795007392
     },
     {
+      "domain": "www.rtpdutaslota.website.abigail-wadidau.shop",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097
+    },
+    {
       "domain": "www.rtpslot88jp6.online.gvp.ltb.mybluehost.me",
       "total": 0,
       "uuids": [],
@@ -2680,6 +2928,30 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795007392
+    },
+    {
+      "domain": "www.superslot3020.ph",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795478097,
+      "scan_uuid": "01a20ad1-c51a-736d-9f87-a1ad243411e7",
+      "scan_status": "done",
+      "scan_title": "Redirecting...",
+      "scan_page_url": "https://www.superslot3020.ph/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a20ad1-c51a-736d-9f87-a1ad243411e7.png",
+      "scan_contacted": [
+        "parking3.parklogic.com",
+        "router.parklogic.com",
+        "www.superslot3020.ph"
+      ],
+      "scan_dom_snippet": "Redirecting... Category Search This domain is available to be registered. Click here to register. superslot3020.ph Education Travel Style & Fashion Music and Audio Personal Finance Video Gaming Automotive Shopping Books and Literature You're on your way 5 You'll be redirected to our sponsor. Stay here Continue now © 2026 ParkLogic.com. All rights reserved. About Us | Contact Us | Privacy Policy | Terms of Service",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795477870
     },
     {
       "domain": "www.superslot4506.ph",
