@@ -2,12 +2,8 @@ name: classify
 
 # Klasifikasi kandidat lewat Gemini + Google Search grounding.
 #
-# Read-only terhadap repo: hasil (blocklist/whitelist/review) hanya jadi
-# artifact, TIDAK di-commit. Alasannya bukan sekadar kerapian -- keluaran LLM
-# belum diverifikasi manusia, jadi mempublikasikannya ke repo publik sama
-# dengan menerbitkan blocklist tanpa review.
-#
-# Terpisah dari ct-grab.yml yang memegang `contents: write` + `git push`.
+# Hasil klasifikasi hanya diunggah sebagai artifact, tidak dipublikasikan ke repo.
+# Keluaran LLM belum diverifikasi manusia dan bukan blocklist.
 #
 # Butuh repository secret GEMINI_API_KEY. Tanpa secret, job gagal di step
 # pertama dengan pesan jelas (bukan diam-diam lolos).
@@ -37,7 +33,7 @@ on:
         default: '0'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: classify
@@ -150,17 +146,6 @@ jobs:
             --merge-out classify-result.json
 
           cp blocklist.txt whitelist.txt review.txt hasil/ 2>/dev/null || true
-
-      - name: Commit hasil klasifikasi
-        if: always()
-        run: |
-          git config user.email "aditiya.saputrax1x2@gmail.com"
-          git config user.name "aditiya-saputra"
-          git checkout -B main
-          git add blocklist.txt whitelist.txt review.txt classify-result.json 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "classify: update blocklist/whitelist/review & ledger $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git pull --rebase origin main
-          git push origin main
 
       - name: Upload hasil
         if: always()

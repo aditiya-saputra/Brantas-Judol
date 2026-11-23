@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `classify` workflow no longer requests write permission or commits unreviewed LLM classifications; results remain Actions artifacts as documented.
+
 ### Changed
 
 - **`classify.py` no longer calls urlscan.io.** Evidence now comes from
