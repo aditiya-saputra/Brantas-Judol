@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1795680899,
+  "generated_at": 1795728740,
   "domains": [
+    {
+      "domain": "aguerocasino.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
     {
       "domain": "ai.beta.honeymoney-casino-10eor.top",
       "total": 1,
@@ -173,6 +182,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "beemcasino.at",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "bento888slot.lol",
       "total": 0,
       "uuids": [],
@@ -328,6 +346,26 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino-cat.bid",
+      "total": 1,
+      "uuids": [
+        "01a21532-8cf3-75ff-ac7a-a3b331413526"
+      ],
+      "first_uuid": "01a21532-8cf3-75ff-ac7a-a3b331413526",
+      "first_url": "https://betting-spa.casino-cat.bid/",
+      "first_scanned": "2026-11-26T00:12:49.275Z",
+      "checked_at": 1795728740
+    },
+    {
+      "domain": "casino-dev4.a8r.games",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "casino-energy-online.co.uk",
@@ -664,6 +702,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "cpcontacts.slota.ch",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "crazyrichslot.pro",
       "total": 0,
       "uuids": [],
@@ -887,6 +934,17 @@
       "checked_at": 1795419383
     },
     {
+      "domain": "dqj.casino",
+      "total": 1,
+      "uuids": [
+        "01a068fd-530e-73b6-b00a-572d795b71da"
+      ],
+      "first_uuid": "01a068fd-530e-73b6-b00a-572d795b71da",
+      "first_url": "https://dqj.casino/",
+      "first_scanned": "2026-09-03T20:37:13.735Z",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "dreamcasino.it",
       "total": 0,
       "uuids": [],
@@ -1094,6 +1152,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "explore.1xslots-pr3.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "ezi88slotgacor.com",
       "total": 0,
       "uuids": [],
@@ -1258,6 +1325,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795094157
+    },
+    {
+      "domain": "gacor368proa.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "gacorimba.com",
@@ -1475,6 +1551,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "insights.1xslots-ea1.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "internal-services.riobetcasino-rvj.top",
       "total": 0,
       "uuids": [],
@@ -1587,6 +1672,36 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795094157
+    },
+    {
+      "domain": "judifs.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740,
+      "scan_uuid": "01a219c2-afc7-722a-8f69-2a1ccc8a6ee0",
+      "scan_status": "done",
+      "scan_title": "judif (@judifs.net) — Bluesky",
+      "scan_page_url": "https://bsky.app/profile/judifs.net",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a219c2-afc7-722a-8f69-2a1ccc8a6ee0.png",
+      "scan_contacted": [
+        "public.api.bsky.app",
+        "cdn.bsky.app",
+        "web-cdn.bsky.app",
+        "events.bsky.app",
+        "app-config.workers.bsky.app",
+        "live-events.workers.bsky.app",
+        "ip.bsky.app",
+        "bsky.app",
+        "judifs.net"
+      ],
+      "scan_dom_snippet": "judif (@judifs.net) — Bluesky Folgen judif @judifs.net she/her/she/her/she/ 175 Follower 610 Folge ich 1422 Posts girl liker extraordinaire wannabe vtuber. h̶o̶p̶e̶l̶e̶s̶s̶ romantic. lifelong comedian. heckin cutie. BEWARE OF HORNYPOSTING!!!!!! judifs.net Vorgeschlagen für dich Mehr sehen Hunter ⋆ pippo 🏳️‍⚧️ 🏴󠁧󠁢󠁷󠁬󠁳󠁿 ΘΔ& ⋆ 23 y/o ⋆ plural audhd system ⋆ SFW ⋆ ˚ . ★⋆ very multifandom reposting cute cool or funny posts . ✦˚ . ⋆ it posts its art here + its project FRACTURED ⋆ ⋆ drawing at its own pace ⋆ ⋆ art tags: #pipposqueak #ps_fractured ⋆ Lupo! I'd bite you if you were closer. Comms closed till I can catch up!!! Posts Medien Videos Angeheftet judif @judifs.net · 5Mo Antwort an judif id like to formally apologize for this statement 1 7 judif @judifs.net · 7 Std. aint i a peach 1 judif @judifs.net · 1 T Go go lantern green minigun 1 judif @judifs.net · 1 T she was funny, like a funny chair 1 judif @judifs.net · 1 T call me charles the way im the man, son 1 judif @judifs.net · 1 T oh man mood swings got me acting up today 1 judif @judifs.net · 3 T puppy is armed :3 1 judif @judifs.net · 5 T 1 judif @judifs.net · 6 T i should eat sumpfink 1 judif @judifs.net · 7 T madoka kyouno 1 judif @judifs.net · 7 T 1 judif @judifs.net · 7 T GIYS I DIDNT DRAW ENOUGH ROSIES TODAY 1/2 1 1 judif @judifs.net · 7 T rosie says she forgive me but i still feel bad :[ 2/2 1 Repostet von judif 4 random letters every 10 mins @4-randomletter.bsky.social · 7 T Segz ALT 12 18 judif @judifs.net · 8 T teen",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795728540
     },
     {
       "domain": "judithwongcounseling.com",
@@ -1797,6 +1912,15 @@
       "scan_scanned_at": 1795329796
     },
     {
+      "domain": "lab.casino455.buzz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "lab.jogoapostascasino.com",
       "total": 1,
       "uuids": [
@@ -1923,6 +2047,15 @@
       "first_url": "https://livescorebetcasino.me.uk/",
       "first_scanned": "2026-11-14T21:33:20.773Z",
       "checked_at": 1795419383
+    },
+    {
+      "domain": "local.casinox-irv.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "login.2513.casino",
@@ -2282,6 +2415,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "monitoring.vodkacasinotopgame1719.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "mpogamingslot2121.pages.dev",
       "total": 0,
       "uuids": [],
@@ -2325,6 +2467,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795559308
+    },
+    {
+      "domain": "n49ldxctngn66jact004-slot.paastest.epimore.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "nagios.9175.casino",
@@ -2444,6 +2595,17 @@
       "checked_at": 1795419383
     },
     {
+      "domain": "ntfllxxcasinorecensioni.com",
+      "total": 1,
+      "uuids": [
+        "01a1828f-ca61-7445-909a-5c5ca9454dcd"
+      ],
+      "first_uuid": "01a1828f-ca61-7445-909a-5c5ca9454dcd",
+      "first_url": "https://ntfllxxcasinorecensioni.com/",
+      "first_scanned": "2026-10-28T12:50:34.814Z",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "nw33.gradeaonlinecasinos.com",
       "total": 0,
       "uuids": [],
@@ -2487,6 +2649,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795329976
+    },
+    {
+      "domain": "okeslot.archwaytheatre.co.uk",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "okslot.bar",
@@ -2940,6 +3111,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "redir.starcasino-bonus.it",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
       "domain": "refuelcasino.co.nl",
       "total": 0,
       "uuids": [],
@@ -3077,6 +3257,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795288627
+    },
+    {
+      "domain": "sapaslot-ind.sbs",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "sb.plexiancasino.com",
@@ -3331,6 +3520,37 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "velvetspins-casino.app",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
+      "domain": "video.riobetcasino-352.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740,
+      "scan_uuid": "01a219c3-5a12-77aa-a935-fa2bfae419ee",
+      "scan_status": "done",
+      "scan_title": "Error 502",
+      "scan_page_url": "https://video.riobetcasino-352.top/",
+      "scan_http_status": 502,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a219c3-5a12-77aa-a935-fa2bfae419ee.png",
+      "scan_contacted": [
+        "video.riobetcasino-352.top"
+      ],
+      "scan_dom_snippet": "Error 502 502 - Bad Gateway . That’s an error. Looks like we have got an invalid response from the upstream server. That’s all we know.",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795728589
+    },
+    {
       "domain": "vipzino-casinos-co-nl-77969-qg5.pages.dev",
       "total": 0,
       "uuids": [],
@@ -3512,6 +3732,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795419383
+    },
+    {
+      "domain": "wildswarmslot.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "winberry.casino",
@@ -3855,7 +4084,7 @@
       "first_uuid": "",
       "first_url": "",
       "first_scanned": "",
-      "checked_at": 1794922369
+      "checked_at": 1795728740
     },
     {
       "domain": "www.kushplay1000.casino",
@@ -3955,6 +4184,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795288627
+    },
+    {
+      "domain": "www.pay.slothmaxxing.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "www.pengeluarantogel.cc",
@@ -4328,6 +4566,24 @@
       "scan_malicious": false,
       "scan_score": 0,
       "scan_scanned_at": 1795248818
+    },
+    {
+      "domain": "yohoslot-slot-gates-olympus-frankenslots-monster-h1epl.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
+    },
+    {
+      "domain": "yoktogel-asli.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795728740
     },
     {
       "domain": "zgs.casino",
