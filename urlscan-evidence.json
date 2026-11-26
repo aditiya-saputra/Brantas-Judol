@@ -1,7 +1,18 @@
 {
   "schema": 1,
-  "generated_at": 1795642995,
+  "generated_at": 1795680899,
   "domains": [
+    {
+      "domain": "ai.beta.honeymoney-casino-10eor.top",
+      "total": 1,
+      "uuids": [
+        "01a02861-3d94-774f-b954-96c5079e6c60"
+      ],
+      "first_uuid": "01a02861-3d94-774f-b954-96c5079e6c60",
+      "first_url": "https://ai.beta.honeymoney-casino-10eor.top/",
+      "first_scanned": "2026-08-22T07:31:04.988Z",
+      "checked_at": 1795680899
+    },
     {
       "domain": "ai.riobetcasino-ove.top",
       "total": 0,
@@ -162,6 +173,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "bento888slot.lol",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "best-casino-norge.com",
       "total": 0,
       "uuids": [],
@@ -308,6 +328,26 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino-energy-online.co.uk",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
+      "domain": "casino-gama-de.com",
+      "total": 1,
+      "uuids": [
+        "01a1ae1c-2d6b-74b6-a8df-6f0d0901a7c2"
+      ],
+      "first_uuid": "01a1ae1c-2d6b-74b6-a8df-6f0d0901a7c2",
+      "first_url": "https://casino-gama-de.com/",
+      "first_scanned": "2026-11-05T23:47:35.637Z",
+      "checked_at": 1795680899
     },
     {
       "domain": "casino-golisimo1.com",
@@ -624,6 +664,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "crazyrichslot.pro",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "crm.0392.casino",
       "total": 0,
       "uuids": [],
@@ -844,7 +893,7 @@
       "first_uuid": "",
       "first_url": "",
       "first_scanned": "",
-      "checked_at": 1795376323
+      "checked_at": 1795680899
     },
     {
       "domain": "drive.selectorcasino-bezdeposita1.ru",
@@ -1054,6 +1103,15 @@
       "checked_at": 1794922369
     },
     {
+      "domain": "f1680slot.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "familygameonlinecasino.co.uk",
       "total": 0,
       "uuids": [],
@@ -1209,6 +1267,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795007392
+    },
+    {
+      "domain": "gacormaxwinkembali.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "gala-casinoe.co.uk",
@@ -1408,6 +1475,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "internal-services.riobetcasino-rvj.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "intranet.catcasino-fmb.top",
       "total": 0,
       "uuids": [],
@@ -1520,6 +1596,28 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795007392
+    },
+    {
+      "domain": "juegalo-casino.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899,
+      "scan_uuid": "01a216e9-5235-72a8-9eaf-4a2962e423e3",
+      "scan_status": "done",
+      "scan_title": "Juegalo Casino | Iniciar sesión, Bienvenida Hasta CLP$543.000",
+      "scan_page_url": "https://juegalo-casino.net/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a216e9-5235-72a8-9eaf-4a2962e423e3.png",
+      "scan_contacted": [
+        "juegalo-casino.net"
+      ],
+      "scan_dom_snippet": "Juegalo Casino | Iniciar sesión, Bienvenida Hasta CLP$543.000 Juegos Sport eSport Promociones Torneos Loterías Acceso Registrarse Acceso Registrarse Juegos Sport eSport Promociones Torneos Loterías Juegalo Juegalo Casino es una plataforma líder en el mercado de juegos de azar online en Chile, reconocida por su ambiente seguro y una experiencia de usuario optimizada para jugadores chilenos. Respaldado por la licencia de juego de Curaçao eGaming (número 1668/JAZ), Juegalo Casino garantiza un entorno justo y transparente para todos sus usuarios. Esta licencia internacional, ampliamente aceptada en la industria, permite operar de forma legal ofreciendo protección tanto para el jugador como para sus fondos. En este artículo se exploran los aspectos más llamativos y beneficiosos de jugar en Juegalo Casino, desde los métodos de pago en CLP, hasta los bonos exclusivos y la calidad de los juegos de su catálogo. Oferta de Bienvenida Hasta CLP$543.000 REGÍSTRESE Visión general y características clave de Juegalo Casino Cada vez más jugadores chilenos buscan plataformas que puedan ofrecer seguridad, variedad y flexibilidad en métodos de pago. Juegalo cumple con estas demandas gracias a su enfoque innovador y su firme compromiso con la calidad del servicio. Fundación 2022 Licencia Curaçao eGaming (1668/JAZ) Propietario Juegalo Corp N.V. Idioma Español Moneda CLP (Peso chileno) Aplicación Versión móvil vía navegador Navegación Abrir Cerrar Visión general y características clave de Juegalo C",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795680735
     },
     {
       "domain": "jyu.casino",
@@ -1722,6 +1820,15 @@
       "scan_scanned_at": 1795248856
     },
     {
+      "domain": "laskartogelmewah.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "leafy-sloth-5809.chatgpt.site",
       "total": 0,
       "uuids": [],
@@ -1834,6 +1941,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1794922369
+    },
+    {
+      "domain": "login.tracking.3802.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "lohanslot.asia",
@@ -2166,6 +2282,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "mpogamingslot2121.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "mundocasinomx.com",
       "total": 0,
       "uuids": [],
@@ -2209,6 +2334,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795514021
+    },
+    {
+      "domain": "nasagacor.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "needforslots.cyou",
@@ -2328,6 +2462,15 @@
       "checked_at": 1795376323
     },
     {
+      "domain": "oasiscasino.3cx.eu",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "office.1xslots-ik.ru",
       "total": 0,
       "uuids": [],
@@ -2382,6 +2525,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795559308
+    },
+    {
+      "domain": "omutogel78amh.site",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "online-casinos-se.co.com",
@@ -2797,6 +2949,17 @@
       "checked_at": 1794922369
     },
     {
+      "domain": "rembrandtcasinoplay-com.pages.dev",
+      "total": 1,
+      "uuids": [
+        "019d56ba-551c-729a-9b39-9f59e0690c09"
+      ],
+      "first_uuid": "019d56ba-551c-729a-9b39-9f59e0690c09",
+      "first_url": "https://rembrandtcasinoplay-com.pages.dev/",
+      "first_scanned": "2026-04-04T04:22:33.281Z",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "report.pokerdomslotbtc.ru",
       "total": 0,
       "uuids": [],
@@ -2923,6 +3086,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "search.pokerdom-casinos-bonus.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "sentry.1747.casino",
@@ -3159,6 +3331,24 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "vipzino-casinos-co-nl-77969-qg5.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
+      "domain": "vodkabet-2025.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "vox-casino-rzeszow-pl-128385-8n0.pages.dev",
       "total": 0,
       "uuids": [],
@@ -3333,6 +3523,15 @@
       "first_url": "https://winberry.casino/?clickid=3t6ml944unnm&cmp=489555&http_referrer=https%3A%2F%2Fkeldorr.net%2F&modal=register&prm=550450&tr_src=seo&tracking_link=http%3A%2F%2Fplay-winberry-one.com%2Fadws2ppe3u",
       "first_scanned": "2026-11-11T18:00:05.471Z",
       "checked_at": 1795419383
+    },
+    {
+      "domain": "wiocasinoyorumcom1.xyz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "wishocasino-casino.dk",
@@ -3686,6 +3885,15 @@
       "checked_at": 1795376323
     },
     {
+      "domain": "www.luckymaticcasino.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "www.merdekaslot.site",
       "total": 0,
       "uuids": [],
@@ -3774,6 +3982,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "www.pututogelspace.site",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     },
     {
       "domain": "www.r7casino366.com",
@@ -4113,6 +4330,15 @@
       "scan_scanned_at": 1795248818
     },
     {
+      "domain": "zgs.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
+    },
+    {
       "domain": "zonder-cruks-online-casino.com",
       "total": 0,
       "uuids": [],
@@ -4120,6 +4346,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "zoome-hub-online.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795680899
     }
   ]
 }
