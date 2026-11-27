@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1795768000,
+  "generated_at": 1795814279,
   "domains": [
+    {
+      "domain": "agenslot.fit",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
     {
       "domain": "agenslotonlinebet.com",
       "total": 0,
@@ -191,6 +200,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "beautyinstitute.judithwilliams.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "beef.1776.casino",
       "total": 0,
       "uuids": [],
@@ -364,6 +382,24 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino-777-hasselt.af88codebet.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
+      "domain": "casino-amok.org",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "casino-be.tunisietoday.xyz",
@@ -740,6 +776,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "cpcalendars.togelcasino.site",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "cpcontacts.holyslot88.net",
       "total": 0,
       "uuids": [],
@@ -959,6 +1004,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795514021
+    },
+    {
+      "domain": "docs.radio.3802.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "dogecoin-casino.uk",
@@ -1190,6 +1244,15 @@
       "checked_at": 1794833499
     },
     {
+      "domain": "euroslots777.at",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "ev999casinobet.com",
       "total": 0,
       "uuids": [],
@@ -1381,6 +1444,17 @@
       "first_url": "https://friendscasino-uk.com/",
       "first_scanned": "2026-11-17T21:37:30.768Z",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "fugucasino23.com",
+      "total": 1,
+      "uuids": [
+        "019cd75c-b592-72ea-a997-19474129c2d7"
+      ],
+      "first_uuid": "019cd75c-b592-72ea-a997-19474129c2d7",
+      "first_url": "https://fugucasino23.com/de",
+      "first_scanned": "2026-03-10T10:48:45.948Z",
+      "checked_at": 1795814279
     },
     {
       "domain": "fungames-slotfb3.lat",
@@ -1625,6 +1699,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "inatogelthebest.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "indratogelslot.org",
       "total": 0,
       "uuids": [],
@@ -1746,6 +1829,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "joy.dqr.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "jp.0250.casino",
@@ -1979,6 +2071,17 @@
       "checked_at": 1795376323
     },
     {
+      "domain": "kometa-casino-playzi1.top",
+      "total": 1,
+      "uuids": [
+        "01a1dc57-ce83-77ec-86c5-3a8e2f7c30e8"
+      ],
+      "first_uuid": "01a1dc57-ce83-77ec-86c5-3a8e2f7c30e8",
+      "first_url": "https://kometa-casino-playzi1.top/",
+      "first_scanned": "2026-11-14T23:15:25.343Z",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "kratosslot.net",
       "total": 1,
       "uuids": [
@@ -2139,6 +2242,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795478097
+    },
+    {
+      "domain": "linkjuditerbaru.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "linkslot235.info",
@@ -2527,6 +2639,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "mobile.1xslots-cb2.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "momentogelato.com",
       "total": 0,
       "uuids": [],
@@ -2563,6 +2684,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795680899
+    },
+    {
+      "domain": "multigame-for-live-crash-slots-uz.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "mundocasinomx.com",
@@ -2709,6 +2839,15 @@
       "checked_at": 1795478097
     },
     {
+      "domain": "nodered.pinco-casino-kb0.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "nodered.vavada-cazinos-sloti.ru",
       "total": 0,
       "uuids": [],
@@ -2754,6 +2893,17 @@
       "first_url": "https://ntfllxxcasinorecensioni.com/",
       "first_scanned": "2026-10-28T12:50:34.814Z",
       "checked_at": 1795728740
+    },
+    {
+      "domain": "nvcasino24-com-a3e3121.pages.dev",
+      "total": 1,
+      "uuids": [
+        "01a082a0-1fbc-726d-93b7-b4faa691b4c7"
+      ],
+      "first_uuid": "01a082a0-1fbc-726d-93b7-b4faa691b4c7",
+      "first_url": "https://nvcasino24.com/",
+      "first_scanned": "2026-09-08T20:05:33.933Z",
+      "checked_at": 1795814279
     },
     {
       "domain": "nw33.gradeaonlinecasinos.com",
@@ -3261,6 +3411,15 @@
       "checked_at": 1794744140
     },
     {
+      "domain": "ragnaro-casino.es",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "rancher.casino41223.buzz",
       "total": 0,
       "uuids": [],
@@ -3416,6 +3575,15 @@
       "first_url": "https://rtptiannew1.com/",
       "first_scanned": "2026-03-18T04:52:56.533Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "rtpupdateprima77.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "rupiahslot88-link-gacor.pages.dev",
@@ -3697,6 +3865,26 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "user.vodka-casino-3zq.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
+      "domain": "v88togelk.lol",
+      "total": 1,
+      "uuids": [
+        "01a081fb-00bc-7358-a474-d3a826a901c3"
+      ],
+      "first_uuid": "01a081fb-00bc-7358-a474-d3a826a901c3",
+      "first_url": "https://v88togelk.lol/",
+      "first_scanned": "2026-09-08T17:05:12.318Z",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "vault.pokerdom-casino-vhod24.top",
       "total": 0,
       "uuids": [],
@@ -3880,6 +4068,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795514021
+    },
+    {
+      "domain": "webmail.canadacasinodays.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "webmail.casino6289.online",
@@ -4257,6 +4454,15 @@
       "checked_at": 1795478097
     },
     {
+      "domain": "www.garaijudit.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
+    },
+    {
       "domain": "www.gaspol188slot.com",
       "total": 0,
       "uuids": [],
@@ -4336,6 +4542,30 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795680899
+    },
+    {
+      "domain": "www.mauritiuscasino.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279,
+      "scan_uuid": "01a21edb-a14b-74eb-91cb-8f0a231d7fc0",
+      "scan_status": "done",
+      "scan_title": "MAURITIUS — THE INDEPENDENT GUIDE TO THE REPUBLIC OF MAURITIUS | Mauricio",
+      "scan_page_url": "https://www.mauritiuscasino.com/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a21edb-a14b-74eb-91cb-8f0a231d7fc0.png",
+      "scan_contacted": [
+        "www.mauritiuscasino.com",
+        "images.unsplash.com",
+        "mauritiuscasino.com"
+      ],
+      "scan_dom_snippet": "MAURITIUS — THE INDEPENDENT GUIDE TO THE REPUBLIC OF MAURITIUS | Mauricio TRAVEL INFORMATION CAR RENTAL TRAVEL ROUTES HOTELS CULTURE & HISTORY M MAURICIO English 中文 Español Deutsch Français THE INDEPENDENT GUIDE TO THE REPUBLIC OF MAURITIUS MAURITIUS 25 DESTINATIONS · 8 PLANNING SECTIONS DISCOVER THE ISLAND ↓ MAURICIO INTERNATIONAL BEAUTIFUL PLACES. SERIOUS TRAVEL INFORMATION. Cities, beaches, nature reserves, routes, hotels, apartments, car rental, culture, history, weather and practical advice for planning a remarkable trip. ROUTES Regional plans without wasted driving MAURICIO → HOTELS Choose the area before the property MAURICIO → CAR RENTAL Roads, insurance and realistic timing MAURICIO → HISTORY The republic, its people and heritage MAURICIO → CULTURE Languages, food, music and festivals MAURICIO → WEATHER Coasts, seasons and the central plateau MAURICIO → INFO VISITOR INFORMATION A neutral tourism reference about the island’s history, locations, visitor rules and cultural context. M MAURICIO PROJECT OWNER ZAZA 3 OÜ CONTACT US INFO@ZAZA.EE MAIN SECTIONS PLACES AND CITIES → TRAVEL ROUTES → CAR RENTAL → HOTELS → APARTMENTS AND VILLAS → CULTURE AND HISTORY → WEATHER → VISITOR INFORMATION → POPULAR PLACES LE MORNE → CHAMAREL → PORT LOUIS → GRAND BAIE → FLIC EN FLAC → BELLE MARE → BLUE BAY → MAHÉBOURG → POPULAR TOPICS THINGS TO DO → SELF-DRIVE ROUTE → HOTELS → APARTMENTS AND VILLAS → HISTORY →",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795814066
     },
     {
       "domain": "www.merdekaslot.site",
@@ -4717,6 +4947,38 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "x75casino.com.br",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279,
+      "scan_uuid": "01a21edc-d183-702d-b06b-dbd1a196c6d6",
+      "scan_status": "done",
+      "scan_title": "X75CASINO.COM ⭐️ - Plataforma Oficial - X75CASINO",
+      "scan_page_url": "https://x75casino.com.br/",
+      "scan_http_status": 200,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a21edc-d183-702d-b06b-dbd1a196c6d6.png",
+      "scan_contacted": [
+        "x75casino.com.br",
+        "static.cloudflareinsights.com"
+      ],
+      "scan_dom_snippet": "X75CASINO.COM ⭐️ - Plataforma Oficial - X75CASINO Login Registrar-se X75CASINO - A Melhor Plataforma de Apostas Cadastre-se na X75CASINO para ganhar bônus no cadastro e em cada recarga. Com a X75CASINO, você tem acesso a promoções incríveis e uma experiência de jogo inigualável. Junte-se aos vencedores agora! CADASTRE-SE Junte-se aos vencedores! Os jogos mais divertidos estão na X75CASINO! CADASTRE-SE Acessos Login Registrar-se Políticas de Privacidade Termos e Condições Políticas de Privacidade A X75CASINO valoriza a privacidade de seus usuários e está empenhada em proteger todas as informações pessoais fornecidas durante o uso de nossos serviços. Todos os dados coletados são utilizados exclusivamente para fins de melhoria contínua da experiência de nossos jogadores. Termos e Condições Os usuários da X75CASINO concordam em respeitar todas as regras e regulamentos estabelecidos. É importante ler e entender todos os termos antes de utilizar nossos serviços. A violação destes termos pode resultar em penalizações ou na suspensão da conta.",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795814139
+    },
+    {
+      "domain": "xoso88slot.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795814279
     },
     {
       "domain": "ygj.casino",
