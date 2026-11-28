@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "generated_at": 1795814279,
+  "generated_at": 1795852040,
   "domains": [
+    {
+      "domain": "agenjudionline01.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
     {
       "domain": "agenslot.fit",
       "total": 0,
@@ -200,6 +209,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "bdgslot.org",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "beautyinstitute.judithwilliams.com",
       "total": 0,
       "uuids": [],
@@ -382,6 +400,24 @@
       "first_url": "https://betzillocasino.ink/",
       "first_scanned": "2026-10-30T02:36:42.972Z",
       "checked_at": 1794655987
+    },
+    {
+      "domain": "casino-34711.lol",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
+      "domain": "casino-6795.buzz",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "casino-777-hasselt.af88codebet.com",
@@ -776,6 +812,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "cpcalendars.link.ayuslotamp.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "cpcalendars.togelcasino.site",
       "total": 0,
       "uuids": [],
@@ -995,6 +1040,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795559308
+    },
+    {
+      "domain": "docs.1wincasino5.ru",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "docs.cpanel.2718.casino",
@@ -1244,6 +1298,17 @@
       "checked_at": 1794833499
     },
     {
+      "domain": "eslot99a.com",
+      "total": 1,
+      "uuids": [
+        "019d3983-05b1-73c5-a9e5-bf1c47d77ec8"
+      ],
+      "first_uuid": "019d3983-05b1-73c5-a9e5-bf1c47d77ec8",
+      "first_url": "https://eslot99a.com/",
+      "first_scanned": "2026-03-29T12:13:31.335Z",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "euroslots777.at",
       "total": 0,
       "uuids": [],
@@ -1444,6 +1509,15 @@
       "first_url": "https://friendscasino-uk.com/",
       "first_scanned": "2026-11-17T21:37:30.768Z",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "frontierplaycasinolounge.shop",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "fugucasino23.com",
@@ -1699,6 +1773,15 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "imap.tmp.3802.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "inatogelthebest.pages.dev",
       "total": 0,
       "uuids": [],
@@ -1829,6 +1912,28 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "joingilaslot.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040,
+      "scan_uuid": "01a2211c-7304-756c-aa27-0d0bc7a7c1c6",
+      "scan_status": "done",
+      "scan_title": "404 Not Found",
+      "scan_page_url": "https://joingilaslot.com/",
+      "scan_http_status": 404,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a2211c-7304-756c-aa27-0d0bc7a7c1c6.png",
+      "scan_contacted": [
+        "joingilaslot.com"
+      ],
+      "scan_dom_snippet": "404 Not Found 404 Not Found The resource requested could not be found on this server! Proudly powered by LiteSpeed Web Server Please be advised that LiteSpeed Technologies Inc. is not a web hosting company and, as such, has no control over content found on this site.",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795851858
     },
     {
       "domain": "joy.dqr.casino",
@@ -2060,6 +2165,15 @@
       "scan_scanned_at": 1795419182
     },
     {
+      "domain": "klavercasinomobiel.nl",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "kometa-casino-amp-42.top",
       "total": 1,
       "uuids": [
@@ -2233,6 +2347,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795514021
+    },
+    {
+      "domain": "lincolnslotsmobilecasino.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "link5.rtpgo55.com",
@@ -2639,6 +2762,15 @@
       "checked_at": 1794581468
     },
     {
+      "domain": "mirror.catcasino-wwy.top",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "mobile.1xslots-cb2.top",
       "total": 0,
       "uuids": [],
@@ -2675,6 +2807,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795728740
+    },
+    {
+      "domain": "mpo007-gacor.link",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "mpogamingslot2121.pages.dev",
@@ -2830,6 +2971,15 @@
       "checked_at": 1795376323
     },
     {
+      "domain": "nines-casino-54.pages.dev",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "no-kyc-casinos.top",
       "total": 0,
       "uuids": [],
@@ -2882,6 +3032,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795419383
+    },
+    {
+      "domain": "ns2.1718.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "ntfllxxcasinorecensioni.com",
@@ -3393,6 +3552,15 @@
       "checked_at": 1795094157
     },
     {
+      "domain": "quick-sloth-2934.chatgpt.site",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "rabbitmq.pokerdom-casino-4bc.top",
       "total": 0,
       "uuids": [],
@@ -3865,6 +4033,39 @@
       "checked_at": 1794655987
     },
     {
+      "domain": "unionjackpots23.live",
+      "total": 1,
+      "uuids": [
+        "01a1f789-ab62-77b2-bc2b-4403250f899f"
+      ],
+      "first_uuid": "01a1f789-ab62-77b2-bc2b-4403250f899f",
+      "first_url": "https://unionjackpots23.live/?cxd=35215_417765_trkg4WQYNRbXmfNvGXfGdjpQ004trk&aff_id=35215",
+      "first_scanned": "2026-11-20T05:59:30.005Z",
+      "checked_at": 1795852040
+    },
+    {
+      "domain": "uploads.5104.casino",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040,
+      "scan_uuid": "01a2211d-0d0a-729d-bb67-7b72a5ce105f",
+      "scan_status": "done",
+      "scan_title": "Error 502",
+      "scan_page_url": "https://uploads.5104.casino/",
+      "scan_http_status": 502,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a2211d-0d0a-729d-bb67-7b72a5ce105f.png",
+      "scan_contacted": [
+        "uploads.5104.casino"
+      ],
+      "scan_dom_snippet": "Error 502 502 - Bad Gateway . That’s an error. Looks like we have got an invalid response from the upstream server. That’s all we know.",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795851897
+    },
+    {
       "domain": "user.vodka-casino-3zq.top",
       "total": 0,
       "uuids": [],
@@ -4050,6 +4251,15 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795514021
+    },
+    {
+      "domain": "webdisk.attentive-charcoal-sloth.213-165-255-240.cpanel.site",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
     },
     {
       "domain": "webdisk.rtpmacau88.com",
@@ -4427,6 +4637,15 @@
       "checked_at": 1795376323
     },
     {
+      "domain": "www.edenslot.net",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "www.eurojackpotresults.info",
       "total": 0,
       "uuids": [],
@@ -4524,6 +4743,30 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795179577
+    },
+    {
+      "domain": "www.lemoncasino-poland.eu",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040,
+      "scan_uuid": "01a2211b-dbff-774b-827d-c8018a2be8b5",
+      "scan_status": "done",
+      "scan_title": "Page not found",
+      "scan_page_url": "https://lemonkasyno.edu.pl/lemon-casino/",
+      "scan_http_status": 404,
+      "scan_screenshot": "https://urlscan.io/screenshots/01a2211b-dbff-774b-827d-c8018a2be8b5.png",
+      "scan_contacted": [
+        "lemonkasyno.edu.pl",
+        "www.googletagmanager.com",
+        "www.lemoncasino-poland.eu"
+      ],
+      "scan_dom_snippet": "Page not found Aplikacja Bonus Logowanie Zaloguj się Rejestracja Zaloguj się Rejestracja Aplikacja Bonus Logowanie 404 Strona nie znaleziona Strona główna Centrum wsparcia Możesz zwrócić się o pomoc do naszego zespołu wsparcia. Działa on przez całą dobę i odpowiada graczom za pomocą kilku dostępnych kanałów komunikacji. Kontakty pomocnicze support@lemon.casino Informacja Regulamin Polityka prywatności Polityka cookies Odpowiedzialna gra O nas FAQ Menu Aplikacja Bonus Logowanie Na łamach lemon-kasyno-pl.com zamieszczamy wyłącznie treści informacyjne o obecnej aktywności kasyna i bukmachera Lemon Casino w Polsce. Nasza strona nie zajmuje się organizowaniem gier hazardowych na prawdziwe pieniądze; jest to platforma informacyjna. Wszystkie produkty lemon.casino są obsługiwane przez OE B.V. na podstawie licencji na gry posiadanej przez OEB.V. zarejestrowany adres Emancipatie Boulevard Dominico F. „Don” Martina 31, Curacao, licencjonowana i regulowana przez prawo Curacao zgodnie z C.I.L. numer licencji Curacao Interactive Licensing N.V. #5536/JAZ. Copyright © 2026 «Lemon Casino». Alternatywy Lemon Casino 100% do 2 250 zł + 200 DS + 1 BONUS CRAB Zdobądź bonus! 125% do 3 496 zł + 250 DS + 1 BONUS CRAB Zdobądź bonus!",
+      "scan_malicious": false,
+      "scan_score": 0,
+      "scan_scanned_at": 1795851819
     },
     {
       "domain": "www.liveonlinecasino.org",
@@ -4918,6 +5161,24 @@
       "checked_at": 1794922369
     },
     {
+      "domain": "www.wulangacor.wulan100.org",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
+      "domain": "www.yoi.fourstarcasino.com",
+      "total": 0,
+      "uuids": [],
+      "first_uuid": "",
+      "first_url": "",
+      "first_scanned": "",
+      "checked_at": 1795852040
+    },
+    {
       "domain": "www2.casino263.online",
       "total": 0,
       "uuids": [],
@@ -5097,6 +5358,17 @@
       "first_url": "",
       "first_scanned": "",
       "checked_at": 1795680899
+    },
+    {
+      "domain": "zodiac-casino-nz.site",
+      "total": 1,
+      "uuids": [
+        "01a21e8b-d5b0-71aa-a9ca-175ab0d55463"
+      ],
+      "first_uuid": "01a21e8b-d5b0-71aa-a9ca-175ab0d55463",
+      "first_url": "https://zodiac-casino-nz.site/",
+      "first_scanned": "2026-11-27T19:47:15.963Z",
+      "checked_at": 1795852040
     },
     {
       "domain": "zonder-cruks-online-casino.com",
